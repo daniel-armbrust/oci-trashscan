@@ -17,6 +17,7 @@ class DbAdb():
                 storage_gbs INTEGER NOT NULL,
                 storage_tbs INTEGER NOT NULL,
                 workload_type TEXT NOT NULL,
+                lifecycle_state TEXT NOT NULL,
                 ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
                 owner TEXT NOT NULL,
                 created_on TEXT NOT NULL
@@ -34,12 +35,12 @@ class DbAdb():
     def add(self, adb_dict):
         dml = '''
            INSERT INTO adb (region, compartment_id, name, ocpu, storage_gbs, 
-              storage_tbs, workload_type, ocid, owner, created_on) 
-           VALUES ("%s", "%s", "%s", "%d", "%d", "%d", "%s", "%s", "%s", "%s");
+              storage_tbs, workload_type, lifecycle_state, ocid, owner, created_on) 
+           VALUES ("%s", "%s", "%s", "%d", "%d", "%d", "%s", "%s", "%s", "%s", "%s");
         ''' % (adb_dict['region'], adb_dict['compartment_id'], adb_dict['name'],
         adb_dict['ocpu'], adb_dict['storage_gbs'], adb_dict['storage_tbs'],
-        adb_dict['workload_type'], adb_dict['ocid'], adb_dict['owner'], 
-        adb_dict['created_on'],)
+        adb_dict['workload_type'],  adb_dict['lifecycle_state'], adb_dict['ocid'], 
+        adb_dict['owner'], adb_dict['created_on'],)
 
         self._db.execute(dml)
         self._db.commit()

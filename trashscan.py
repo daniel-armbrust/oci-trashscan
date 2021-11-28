@@ -66,7 +66,7 @@ def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
     """    
     service_func_list = [utils.scan_adb, utils.scan_odb, utils.scan_compute, 
         utils.scan_blockstorage, utils.scan_mysql]
-    
+        
     logo()
     print('*** Investigating compartments...\n')
 

@@ -21,8 +21,8 @@ def scan_adb(oci_config, db_dir, compartment_props):
 
     """
     adb_dict = {'region': '', 'compartment_id': '', 'name': '', 'ocpu': 0, 
-        'storage_gbs': 0, 'storage_tbs': 0, 'workload_type': '', 'ocid': '',
-        'owner': '', 'created_on': ''}
+        'storage_gbs': 0, 'storage_tbs': 0, 'workload_type': '', 'lifecycle_state': '',
+        'ocid': '', 'owner': '', 'created_on': ''}
     
     adb_list = []
 
@@ -42,6 +42,7 @@ def scan_adb(oci_config, db_dir, compartment_props):
         adb_dict['storage_gbs'] = adb_props.data_storage_size_in_gbs
         adb_dict['storage_tbs'] = adb_props.data_storage_size_in_tbs
         adb_dict['workload_type'] = adb_props.db_workload
+        adb_dict['lifecycle_state'] = adb_props.lifecycle_state
         adb_dict['ocid'] = adb_props.id
         adb_dict['owner'] = adb_props.defined_tags['Oracle-Tags']['CreatedBy']
         adb_dict['created_on'] = adb_props.defined_tags['Oracle-Tags']['CreatedOn']
