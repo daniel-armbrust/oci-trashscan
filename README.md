@@ -1,1 +1,1 @@
-# oci-trashscan
+# OCI TrashScan

@@ -57,9 +57,9 @@ def init_oci_sdk(config_file='~/.oci/config', region=None):
 
 
 def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
-    '''Function that starts the trash scan.
+    """Function that starts the trash scan.
 
-    '''    
+    """    
     service_func_list = [utils.scan_adb, utils.scan_odb, utils.scan_compute, 
         utils.scan_blockstorage]
 
@@ -107,7 +107,11 @@ def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
                 else:
                     region_count += 1     
 
+
 def main(argv):
+    """Main execution. Parse the command line.
+    
+    """
     oci_config_file = '~/.oci/config'
     
     db_dir = os.getcwd() + '/db'
