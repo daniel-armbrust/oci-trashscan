@@ -65,8 +65,8 @@ def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
 
     """    
     service_func_list = [utils.scan_adb, utils.scan_odb, utils.scan_compute, 
-        utils.scan_blockstorage]
-
+        utils.scan_blockstorage, utils.scan_mysql]
+    
     logo()
     print('*** Investigating compartments...\n')
 
@@ -138,6 +138,10 @@ def main(argv):
             try:            
                 max_regions_parallel = int(arg)
             except ValueError:
+                show_help()
+                sys.exit(1)
+            
+            if max_regions_parallel < 1:
                 show_help()
                 sys.exit(1)
       

@@ -8,6 +8,7 @@ from . import oci_blockstorage
 
 from . import db_adb
 from . import db_odb
+from . import db_mysql
 from . import db_compute
 
 def __line_cleaner():
@@ -143,3 +144,40 @@ def scan_blockstorage(oci_config, db_dir, compartment_props):
         db.add(blockstorage_dict)
     
     db.close()
+
+
+def scan_mysql(oci_config, db_dir, compartment_props):
+    """Scan MySQL.
+
+    """
+    mysql_dict = {'region': '', 'compartment_id': '', 'name': '', 'version': '', 
+        'shape': '', 'highly_available': '', 'lifecycle_state': '', 'ocid': '', 
+        'owner': '', 'created_on': ''}
+
+    print('--> Scanning MYSQL - Comp.: %s (%s) | Region: %s' % \
+        (compartment_props.id, compartment_props.name, oci_config['region'],))
+    
+    oci_db = oci_database.OciDatabase(oci_config)    
+    mysql_list = oci_db.list_mysql(compartment_props.id)
+    
+    db = db_mysql.DbMysql(db_dir)
+
+    for mysql_props in mysql_list:
+        mysql_details = oci_db.get_mysql(mysql_props.id)
+
+        mysql_dict['region'] = oci_config['region']
+        mysql_dict['compartment_id'] = mysql_props.compartment_id
+        mysql_dict['name'] = mysql_props.display_name
+        mysql_dict['version'] = mysql_props.mysql_version
+        mysql_dict['shape'] = mysql_details.shape_name
+        mysql_dict['highly_available'] = mysql_props.is_highly_available
+        mysql_dict['lifecycle_state'] = mysql_props.lifecycle_state
+        mysql_dict['ocid'] = mysql_props.id
+        mysql_dict['owner'] = mysql_props.defined_tags['Oracle-Tags']['CreatedBy']
+        mysql_dict['created_on'] = mysql_props.defined_tags['Oracle-Tags']['CreatedOn']
+
+        db.add(mysql_dict)
+
+    db.close()
+      
+
