@@ -19,6 +19,10 @@ TRASH_SCAN_VERSION = '1.0b'
 LICENSE = 'GPLv3'
 AUTHOR = 'Daniel Armbrust <darmbrust@gmail.com>'
 
+# Setting the environment variable to True will enable retries with DEFAULT_RETRY_STRATEGY
+# https://docs.oracle.com/en-us/iaas/tools/python/2.51.0/sdk_behaviors/retries.html
+OCI_SDK_DEFAULT_RETRY_ENABLED=True
+
 
 def logo():
     logo_text = '''
