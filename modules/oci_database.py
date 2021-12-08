@@ -6,23 +6,26 @@ from time import sleep
 
 from oci import database
 from oci import mysql
+from oci import retry as oci_retry
 
 
 class OciDatabase():
-    def __init__(self, oci_config): 
-        self._oci_config = oci_config               
+    def __init__(self, oci_config, timeout=120): 
+        self._oci_config = oci_config
+        self._timeout = timeout      
       
     def list_adb(self, compartment_id, sleep_time=0):
         """List all Autonomous Databases from the specified compartment.
 
         """
         adb_list = []
-        next_page_id = ''
+        next_page_id = None
 
-        dbclient = database.DatabaseClient(self._oci_config)
+        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)
 
         while True:
-            resp = dbclient.list_autonomous_databases(compartment_id, page=next_page_id)          
+            resp = dbclient.list_autonomous_databases(compartment_id, page=next_page_id,
+                retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)          
            
             for resp_data in resp.data:
                 adb_list.append(resp_data)
@@ -42,9 +45,9 @@ class OciDatabase():
 
         """
         odb_list = []
-        next_page_id = ''
+        next_page_id = None
 
-        dbclient = database.DatabaseClient(self._oci_config)
+        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)
         
         while True:
             resp = dbclient.list_db_systems(compartment_id, page=next_page_id)          
@@ -69,7 +72,7 @@ class OciDatabase():
         mysql_list = []
         next_page_id = None
 
-        dbclient = mysql.DbSystemClient(self._oci_config)
+        dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)
 
         while True:
             resp = dbclient.list_db_systems(compartment_id, page=next_page_id)          
@@ -91,7 +94,8 @@ class OciDatabase():
         """Get information about the specified MySQL DB System.
 
         """
-        dbclient = mysql.DbSystemClient(self._oci_config)
+        dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)
+
         resp_data = dbclient.get_db_system(mysql_id).data
 
         return resp_data

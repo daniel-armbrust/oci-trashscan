@@ -31,9 +31,6 @@ class DbCompute():
             self._db = sqlite3.connect(compute_db_file)
 
     def add(self, compute_dict):        
-        
-        print(compute_dict)
-
         dml = '''
            INSERT INTO compute (region, compartment_id, name, ad, lifecycle_state, 
               shape, ocid, owner, created_on) 
@@ -44,6 +41,21 @@ class DbCompute():
 
         self._db.execute(dml)
         self._db.commit()
+    
+    def list(self, owner=None):
+        if owner is not None:
+            dml = '''
+               SELECT id, region, ocid, owner FROM compute WHERE LIKE "%%%s";
+            ''' % (owner,)
+        else:
+            dml = '''
+               SELECT id, region, ocid, owner FROM compute;
+            '''
+
+        cursor = self._db.execute(dml)
+        compute_list = cursor.fetchall()
+
+        return compute_list
 
     def close(self):
         self._db.close()

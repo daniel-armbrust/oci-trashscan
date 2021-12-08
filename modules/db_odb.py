@@ -40,7 +40,7 @@ class DbOdb():
         adb_dict['ocid'], adb_dict['owner'], adb_dict['created_on'],)       
 
         self._db.execute(dml)
-        self._db.commit()
+        self._db.commit()  
 
     def close(self):
         self._db.close()

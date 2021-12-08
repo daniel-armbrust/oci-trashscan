@@ -1,5 +1,5 @@
 #
-# trashscan.py
+# trash-scan.py
 #
 
 import sys
@@ -18,11 +18,6 @@ from modules import utils
 TRASH_SCAN_VERSION = '1.0b'
 LICENSE = 'GPLv3'
 AUTHOR = 'Daniel Armbrust <darmbrust@gmail.com>'
-
-# Setting the environment variable to True will enable retries with DEFAULT_RETRY_STRATEGY
-# https://docs.oracle.com/en-us/iaas/tools/python/2.51.0/sdk_behaviors/retries.html
-OCI_SDK_DEFAULT_RETRY_ENABLED=True
-
 
 def logo():
     logo_text = '''
@@ -54,8 +49,8 @@ def show_help():
 
 
 def init_oci_sdk(config_file='~/.oci/config', region=None):    
-    config = oci.config.from_file(file_location=config_file)
-    oci.config.validate_config(config, timeout=300)
+    config = oci.config.from_file(file_location=config_file)    
+    oci.config.validate_config(config)
     
     return config
 
@@ -64,9 +59,13 @@ def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
     """Function that starts the trash scan.
 
     """    
-    service_func_list = [utils.scan_adb, utils.scan_odb, utils.scan_compute, 
-        utils.scan_blockstorage, utils.scan_mysql]
-        
+    #service_func_list = [utils.scan_adb, utils.scan_odb, utils.scan_compute, 
+    #    utils.scan_blockstorage, utils.scan_mysql, utils.scan_fss, utils.scan_oke,
+    #    utils.scan_analytics, utils.scan_goldengate]
+    #service_func_list = [utils.scan_oke]
+
+    service_func_list = [utils.scan_goldengate]
+
     logo()
     print('*** Investigating compartments...\n')
 
@@ -81,9 +80,8 @@ def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
     # List ALL subscribed regions
     subscrb_regions_list = idt.list_my_regions(tenant_id)  
 
-    for compartment_props in compartment_list:      
-          
-        for service_func in service_func_list:
+    for service_func in service_func_list:
+        for compartment_props in compartment_list:      
             regions = subscrb_regions_list.copy()
 
             region_count = 1
@@ -158,6 +156,7 @@ def main(argv):
 
     print('\n\nFinish...')
     sys.exit(0)    
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])

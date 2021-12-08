@@ -2,19 +2,23 @@
 # modules/utils.py
 #
 
+from . import oci_identity
 from . import oci_database
 from . import oci_compute
 from . import oci_blockstorage
+from . import oci_filestorage
+from . import oci_oke
+from . import oci_analytics
+from . import oci_goldengate
 
 from . import db_adb
 from . import db_odb
 from . import db_mysql
 from . import db_compute
+from . import db_blockstorage
+from . import db_fss
+from . import db_analytics
 
-def __line_cleaner():
-    for x in range(75):
-        print('*' * (75 - x), x, end='\x1b[1K\r')
-    
     
 def scan_adb(oci_config, db_dir, compartment_props):
     """Scan Autonomous Databases.
@@ -44,8 +48,12 @@ def scan_adb(oci_config, db_dir, compartment_props):
         adb_dict['workload_type'] = adb_props.db_workload
         adb_dict['lifecycle_state'] = adb_props.lifecycle_state
         adb_dict['ocid'] = adb_props.id
-        adb_dict['owner'] = adb_props.defined_tags['Oracle-Tags']['CreatedBy']
-        adb_dict['created_on'] = adb_props.defined_tags['Oracle-Tags']['CreatedOn']
+
+        try:
+            adb_dict['owner'] = adb_props.defined_tags['Oracle-Tags']['CreatedBy']
+            adb_dict['created_on'] = adb_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            pass
         
         db.add(adb_dict)
 
@@ -75,8 +83,12 @@ def scan_odb(oci_config, db_dir, compartment_props):
         odb_dict['shape'] = odb_props.shape
         odb_dict['storage_gbs'] = odb_props.data_storage_size_in_gbs        
         odb_dict['ocid'] = odb_props.id
-        odb_dict['owner'] = odb_props.defined_tags['Oracle-Tags']['CreatedBy']
-        odb_dict['created_on'] = odb_props.defined_tags['Oracle-Tags']['CreatedOn']
+
+        try:
+            odb_dict['owner'] = odb_props.defined_tags['Oracle-Tags']['CreatedBy']
+            odb_dict['created_on'] = odb_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            pass
         
         db.add(odb_dict)
 
@@ -106,8 +118,12 @@ def scan_compute(oci_config, db_dir, compartment_props):
         compute_dict['lifecycle_state'] = cpt_props.lifecycle_state
         compute_dict['shape'] = cpt_props.shape
         compute_dict['ocid'] = cpt_props.id
-        compute_dict['owner'] = cpt_props.defined_tags['Oracle-Tags']['CreatedBy']
-        compute_dict['created_on'] = cpt_props.defined_tags['Oracle-Tags']['CreatedOn']
+
+        try:
+            compute_dict['owner'] = cpt_props.defined_tags['Oracle-Tags']['CreatedBy']
+            compute_dict['created_on'] = cpt_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            pass
 
         db.add(compute_dict)
 
@@ -128,7 +144,7 @@ def scan_blockstorage(oci_config, db_dir, compartment_props):
     oci_blkstorage = oci_blockstorage.OciBlockStorage(oci_config)
     blkstorage_list = oci_blkstorage.list_volumes(compartment_props.id)
 
-    db = db_compute.DbCompute(db_dir)
+    db = db_blockstorage.DbBlockStorage(db_dir)
 
     for blkstr_props in blkstorage_list:
         blockstorage_dict['region'] = oci_config['region']
@@ -139,8 +155,13 @@ def scan_blockstorage(oci_config, db_dir, compartment_props):
         blockstorage_dict['size_gbs'] = blkstr_props.size_in_gbs
         blockstorage_dict['size_mbs'] = blkstr_props.size_in_mbs
         blockstorage_dict['vpus_per_gb'] = blkstr_props.vpus_per_gb
-        blockstorage_dict['owner'] = blkstr_props.defined_tags['Oracle-Tags']['CreatedBy']
-        blockstorage_dict['created_on'] = blkstr_props.defined_tags['Oracle-Tags']['CreatedOn']
+        blockstorage_dict['ocid'] = blkstr_props.id
+
+        try:
+            blockstorage_dict['owner'] = blkstr_props.defined_tags['Oracle-Tags']['CreatedBy']
+            blockstorage_dict['created_on'] = blkstr_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            pass
 
         db.add(blockstorage_dict)
     
@@ -174,11 +195,127 @@ def scan_mysql(oci_config, db_dir, compartment_props):
         mysql_dict['highly_available'] = mysql_props.is_highly_available
         mysql_dict['lifecycle_state'] = mysql_props.lifecycle_state
         mysql_dict['ocid'] = mysql_props.id
-        mysql_dict['owner'] = mysql_props.defined_tags['Oracle-Tags']['CreatedBy']
-        mysql_dict['created_on'] = mysql_props.defined_tags['Oracle-Tags']['CreatedOn']
+
+        try:
+            mysql_dict['owner'] = mysql_props.defined_tags['Oracle-Tags']['CreatedBy']
+            mysql_dict['created_on'] = mysql_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            pass
 
         db.add(mysql_dict)
 
     db.close()
       
 
+def scan_fss(oci_config, db_dir, compartment_props):
+    """Scan File System Storage (FSS).
+
+    """
+    fss_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '',
+        'ocid': '', 'lifecycle_state': '', 'owner': '', 'created_on': ''}
+
+    print('--> Scanning FSS - Comp.: %s (%s) | Region: %s' % \
+        (compartment_props.id, compartment_props.name, oci_config['region'],))
+ 
+    idt = oci_identity.Identity(oci_config)
+    ad_list = idt.list_ads(compartment_props.id)
+
+    oci_fss = oci_filestorage.OciFileStorage(oci_config)   
+
+    fss_ad_list = []
+
+    for ad in ad_list:
+        fss_list = oci_fss.list_filesystems(compartment_id=compartment_props.id, ad=ad)
+
+        for resp in fss_list:          
+            fss_ad_list.append(resp)
+    
+    db = db_fss.DbFss(db_dir)
+
+    for fss_props in fss_ad_list:
+        fss_dict['region'] = oci_config['region']
+        fss_dict['compartment_id'] = fss_props.compartment_id
+        fss_dict['name'] = fss_props.display_name
+        fss_dict['ad'] = fss_props.availability_domain
+        fss_dict['ocid'] = fss_props.id
+        fss_dict['lifecycle_state'] = fss_props.lifecycle_state
+
+        try:
+            fss_dict['owner'] = fss_props.defined_tags['Oracle-Tags']['CreatedBy']
+            fss_dict['created_on'] = fss_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            pass
+
+        db.add(fss_dict)
+    
+    db.close()
+
+
+def scan_oke(oci_config, db_dir, compartment_props):
+    """Scan Container Engine for Kubernetes (OKE).
+
+    """
+
+    print('--> Scanning OKE - Comp.: %s (%s) | Region: %s' % \
+        (compartment_props.id, compartment_props.name, oci_config['region'],))
+
+    oke = oci_oke.OciOke(oci_config)
+    oke_cluster_list = oke.list_clusters(compartment_id=compartment_props.id)
+
+    print(oke_cluster_list)
+
+
+def scan_analytics(oci_config, db_dir, compartment_props):
+    """Scan Analytics instances.
+
+    """
+    analytics_dict = {'region': '', 'compartment_id': '', 'name': '', 'capacity_type': '',
+        'capacity_value': '', 'feature_set': '', 'lifecycle_state': '', 'ocid': '', 
+        'license_type': '', 'owner': '', 'created_on': ''}
+
+    print('--> Scanning ANALYTICS - Comp.: %s (%s) | Region: %s' % \
+        (compartment_props.id, compartment_props.name, oci_config['region'],))
+
+    analytics = oci_analytics.OciAnalytics(oci_config)
+    analytics_list = analytics.list_instances(compartment_id=compartment_props.id)
+
+    db = db_analytics.DbAnalytics(db_dir)
+
+    for analytics_props in analytics_list:
+        analytics_dict['region'] = oci_config['region']
+        analytics_dict['compartment_id'] = analytics_props.compartment_id
+        analytics_dict['name'] = analytics_props.name
+        analytics_dict['capacity_type'] = analytics_props.capacity.capacity_type
+        analytics_dict['capacity_value'] = analytics_props.capacity.capacity_value
+        analytics_dict['feature_set'] = analytics_props.feature_set
+        analytics_dict['lifecycle_state'] = analytics_props.lifecycle_state
+        analytics_dict['ocid'] = analytics_props.id
+        analytics_dict['license_type'] = analytics_props.license_type
+
+        try:
+            analytics_dict['owner'] = analytics_props.defined_tags['Oracle-Tags']['CreatedBy']
+            analytics_dict['created_on'] = analytics_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except AttributeError:
+            analytics_dict['created_on'] = analytics_props.time_created
+
+        db.add(analytics_dict)
+    
+    db.close()
+    
+
+def scan_goldengate(oci_config, db_dir, compartment_props):
+    """Scan GoldenGate.
+
+    """
+    gg_dict = {'region': '', 'compartment_id': '', 'name': '', 'capacity_type': '',
+        'capacity_value': '', 'feature_set': '', 'lifecycle_state': '', 'ocid': '', 
+        'license_type': '', 'owner': '', 'created_on': ''}
+
+    print('--> Scanning GOLDENGATE - Comp.: %s (%s) | Region: %s' % \
+        (compartment_props.id, compartment_props.name, oci_config['region'],))
+
+    gg = oci_goldengate.OciGoldenGate(oci_config)
+    #gg_list = gg.list_deployments(compartment_id=compartment_props.id)
+    gg_list = gg.list_database_registrations(compartment_id='ocid1.compartment.oc1..aaaaaaaaeuoahv6qbohyqqxfoj4ku7zlc5oql4a6z7o6xlkrzrjpkrvpmoja')
+
+    print(gg_list)    
