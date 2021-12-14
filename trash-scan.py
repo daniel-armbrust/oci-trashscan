@@ -10,7 +10,7 @@ from multiprocessing import Process
 import oci
 
 from modules import oci_identity
-from modules import utils
+from modules import utils_scan
 
 #
 # Globals
@@ -59,12 +59,12 @@ def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
     """Function that starts the trash scan.
 
     """    
-    #service_func_list = [utils.scan_adb, utils.scan_odb, utils.scan_compute, 
-    #    utils.scan_blockstorage, utils.scan_mysql, utils.scan_fss, utils.scan_oke,
-    #    utils.scan_analytics, utils.scan_goldengate]
+    #service_func_list = [utils_scan.adb, utils_scan.odb, utils_scan.compute, 
+    #    utils_scan.blockstorage, utils_scan.mysql, utils_scan.fss, utils_scan.oke,
+    #    utils_scan.analytics, utils_scan.goldengate]
     #service_func_list = [utils.scan_oke]
 
-    service_func_list = [utils.scan_goldengate]
+    service_func_list = [utils_scan.fss]
 
     logo()
     print('*** Investigating compartments...\n')

@@ -13,7 +13,7 @@ class OciCompute():
     def __init__(self, oci_config, timeout=120):
         self._cptclient = ComputeClient(oci_config, timeout=timeout)
     
-    def list_instances(self, compartment_id, sleep_time=0):
+    def list_instances(self, compartment_id):
         """List all the compute instances in the specified compartment.
         
         """
@@ -31,10 +31,7 @@ class OciCompute():
                 next_page_id = resp.next_page
             else:
                 break
-
-            # Wait for the next API query to not flood the OCI
-            sleep(sleep_time)
-
+           
         return compute_list
     
     def exists(self, ocid):
@@ -48,7 +45,7 @@ class OciCompute():
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
-        
+                
         lifecycle_state = resp.data.lifecycle_state
         
         if lifecycle_state not in invalid_lifecycle_state:
@@ -59,11 +56,11 @@ class OciCompute():
     def terminate(self, ocid):
         """Terminates the specified instance.
 
-        """
+        """        
         resp = self._cptclient.terminate_instance(instance_id=ocid, 
-            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
-            
-        if resp.status == 200:
+            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)                               
+
+        if resp.status >= 200 and resp.status < 300:
             return True
         else:
-            return False
+            return False        

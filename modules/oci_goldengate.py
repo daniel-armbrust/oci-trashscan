@@ -12,7 +12,7 @@ class OciGoldenGate():
     def __init__(self, oci_config, timeout=120):
         self._ggclient = GoldenGateClient(oci_config, timeout=timeout)
     
-    def list_database_registrations(self, compartment_id, sleep_time=0):
+    def list_database_registrations(self, compartment_id):
         """Lists all the DatabaseRegistrations in the compartment.
         
         """
@@ -30,8 +30,5 @@ class OciGoldenGate():
                 next_page_id = resp.next_page
             else:
                 break
-
-            # Wait for the next API query to not flood the OCI
-            sleep(sleep_time)
-
+        
         return dbr_list

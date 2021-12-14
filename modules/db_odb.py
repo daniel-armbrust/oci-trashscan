@@ -42,5 +42,28 @@ class DbOdb():
         self._db.execute(dml)
         self._db.commit()  
 
+    def delete(self, id):
+        dml = '''
+            DELETE FROM odb WHERE id = %d;
+        ''' % (id,)
+
+        self._db.execute(dml)
+        self._db.commit()
+
+    def list(self, owner=None):
+        if owner is not None:
+            dml = '''
+               SELECT id, region, ocid, owner FROM odb WHERE owner LIKE "%%%s";
+            ''' % (owner,)            
+        else:
+            dml = '''
+               SELECT id, region, ocid, owner FROM odb;
+            '''
+
+        cursor = self._db.execute(dml)
+        adb_list = cursor.fetchall()
+
+        return adb_list
+
     def close(self):
         self._db.close()

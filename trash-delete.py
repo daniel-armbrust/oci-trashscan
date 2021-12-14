@@ -41,8 +41,7 @@ def show_help():
     Options:
        -h, --help           Show this help and exit.
 
-       -c                   The path of the OCI config file (default to: ~/.oci/config)   
-       -r                   Number of OCI Regions to scan in parallel (default to: 2)
+       -c                   The path of the OCI config file (default to: ~/.oci/config)          
        -u                   Specify the username to delete resources (default to: all users)
               
     '''
@@ -61,7 +60,9 @@ def start_trash_delete(oci_config_file, db_dir, user_login_delete):
     """Function that starts the delete of resources.
 
     """
-    service_func_list = [utils_delete.compute]
+    #service_func_list = [utils_delete.adb, utils_delete.odb, utils_delete.compute,
+    #     utils_delete.blockstorage, utils_delete.mysql, utils_delete.fss]
+    service_func_list = [utils_delete.adb]
 
     logo()
     print('*** Starting DELETING resources...\n')
@@ -70,9 +71,6 @@ def start_trash_delete(oci_config_file, db_dir, user_login_delete):
 
     for service_func in service_func_list:
         service_func(oci_config, db_dir, user_login_delete)
-
-
-
 
 
 def main(argv):

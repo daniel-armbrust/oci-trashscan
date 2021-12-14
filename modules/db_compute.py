@@ -42,11 +42,19 @@ class DbCompute():
         self._db.execute(dml)
         self._db.commit()
     
+    def delete(self, id):
+        dml = '''
+            DELETE FROM compute WHERE id = %d;
+        ''' % (id,)
+
+        self._db.execute(dml)
+        self._db.commit()
+        
     def list(self, owner=None):
         if owner is not None:
             dml = '''
-               SELECT id, region, ocid, owner FROM compute WHERE LIKE "%%%s";
-            ''' % (owner,)
+               SELECT id, region, ocid, owner FROM compute WHERE owner LIKE "%%%s";
+            ''' % (owner,)            
         else:
             dml = '''
                SELECT id, region, ocid, owner FROM compute;

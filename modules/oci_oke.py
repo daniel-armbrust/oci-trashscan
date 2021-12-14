@@ -12,7 +12,7 @@ class OciOke():
     def __init__(self, oci_config, timeout=120):
         self._okeclient = ContainerEngineClient(oci_config, timeout=timeout)
     
-    def list_clusters(self, compartment_id, sleep_time=0):
+    def list_clusters(self, compartment_id):
         """Lists all OKE (Oracle Kubernetes Engine) in a compartment.
 
         """
@@ -30,9 +30,6 @@ class OciOke():
                 next_page_id = resp.next_page
             else:
                 break
-
-            # Wait for the next API query to not flood the OCI
-            sleep(sleep_time)
-
+          
         return cluster_list
         

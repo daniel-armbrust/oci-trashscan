@@ -12,7 +12,7 @@ class OciAnalytics():
     def __init__(self, oci_config, timeout=120):
         self._alytsclient = AnalyticsClient(oci_config, timeout=timeout)
     
-    def list_instances(self, compartment_id, sleep_time=0):
+    def list_instances(self, compartment_id):
         """Lists all Analytics instances in a compartment.
 
         """
@@ -30,9 +30,6 @@ class OciAnalytics():
                 next_page_id = resp.next_page
             else:
                 break
-
-            # Wait for the next API query to not flood the OCI
-            sleep(sleep_time)
 
         return analytics_list
         

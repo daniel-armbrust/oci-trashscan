@@ -43,6 +43,29 @@ class DbMysql():
 
         self._db.execute(dml)
         self._db.commit()
+    
+    def list(self, owner=None):
+        if owner is not None:
+            dml = '''
+               SELECT id, region, ocid, owner FROM mysql WHERE owner LIKE "%%%s";
+            ''' % (owner,)            
+        else:
+            dml = '''
+               SELECT id, region, ocid, owner FROM mysql;
+            '''
+
+        cursor = self._db.execute(dml)
+        mysql_list = cursor.fetchall()
+
+        return mysql_list
+    
+    def delete(self, id):
+        dml = '''
+            DELETE FROM mysql WHERE id = %d;
+        ''' % (id,)
+
+        self._db.execute(dml)
+        self._db.commit()
 
     def close(self):
         self._db.close()
