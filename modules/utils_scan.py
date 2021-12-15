@@ -25,7 +25,7 @@ def adb(oci_config, db_dir, compartment_props):
 
     """
     adb_dict = {'region': '', 'compartment_id': '', 'name': '', 'ocpu': 0, 
-        'storage_gbs': 0, 'storage_tbs': 0, 'workload_type': '', 'lifecycle_state': '',
+        'storage_gbs': 0, 'storage_tbs': 0, 'workload_type': '', 
         'ocid': '', 'owner': '', 'created_on': ''}
     
     adb_list = []
@@ -45,8 +45,7 @@ def adb(oci_config, db_dir, compartment_props):
         adb_dict['ocpu'] = adb_props.cpu_core_count
         adb_dict['storage_gbs'] = adb_props.data_storage_size_in_gbs
         adb_dict['storage_tbs'] = adb_props.data_storage_size_in_tbs
-        adb_dict['workload_type'] = adb_props.db_workload
-        adb_dict['lifecycle_state'] = adb_props.lifecycle_state
+        adb_dict['workload_type'] = adb_props.db_workload        
         adb_dict['ocid'] = adb_props.id
 
         try:
@@ -100,12 +99,8 @@ def compute(oci_config, db_dir, compartment_props):
 
     """
     compute_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '',
-        'lifecycle_state': '', 'shape': '', 'ocid': '', 'owner': '', 'created_on': ''}
-    
-    custom_img_dict = {'region': '', 'compartment_id': '', 'billable_size_in_gbs': 0,
-        'name': '', 'ocid': '', 'operating_system': '', 'operating_system_version': '',
-        'size_in_mbs': 0, 'owner': '', 'created_on': ''}
-
+        'shape': '', 'ocid': '', 'owner': '', 'created_on': ''}   
+   
     print('--> Scanning COMPUTE INSTANCES - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
     
@@ -217,8 +212,8 @@ def mysql(oci_config, db_dir, compartment_props):
 
     """
     mysql_dict = {'region': '', 'compartment_id': '', 'name': '', 'version': '', 
-        'shape': '', 'highly_available': '', 'lifecycle_state': '', 'ocid': '', 
-        'owner': '', 'created_on': ''}
+        'shape': '', 'highly_available': '', 'ocid': '', 'owner': '', 
+        'created_on': ''}
 
     print('--> Scanning MYSQL - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
@@ -236,8 +231,7 @@ def mysql(oci_config, db_dir, compartment_props):
         mysql_dict['name'] = mysql_props.display_name
         mysql_dict['version'] = mysql_props.mysql_version
         mysql_dict['shape'] = mysql_details.shape_name
-        mysql_dict['highly_available'] = mysql_props.is_highly_available
-        mysql_dict['lifecycle_state'] = mysql_props.lifecycle_state
+        mysql_dict['highly_available'] = mysql_props.is_highly_available        
         mysql_dict['ocid'] = mysql_props.id
 
         try:
@@ -379,8 +373,8 @@ def analytics(oci_config, db_dir, compartment_props):
 
     """
     analytics_dict = {'region': '', 'compartment_id': '', 'name': '', 'capacity_type': '',
-        'capacity_value': '', 'feature_set': '', 'lifecycle_state': '', 'ocid': '', 
-        'license_type': '', 'owner': '', 'created_on': ''}
+        'capacity_value': '', 'feature_set': '', 'ocid': '', 'license_type': '', 
+        'owner': '', 'created_on': ''}
 
     print('--> Scanning ANALYTICS - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
@@ -396,8 +390,7 @@ def analytics(oci_config, db_dir, compartment_props):
         analytics_dict['name'] = analytics_props.name
         analytics_dict['capacity_type'] = analytics_props.capacity.capacity_type
         analytics_dict['capacity_value'] = analytics_props.capacity.capacity_value
-        analytics_dict['feature_set'] = analytics_props.feature_set
-        analytics_dict['lifecycle_state'] = analytics_props.lifecycle_state
+        analytics_dict['feature_set'] = analytics_props.feature_set        
         analytics_dict['ocid'] = analytics_props.id
         analytics_dict['license_type'] = analytics_props.license_type
 
@@ -417,8 +410,8 @@ def goldengate(oci_config, db_dir, compartment_props):
 
     """
     gg_dict = {'region': '', 'compartment_id': '', 'name': '', 'capacity_type': '',
-        'capacity_value': '', 'feature_set': '', 'lifecycle_state': '', 'ocid': '', 
-        'license_type': '', 'owner': '', 'created_on': ''}
+        'capacity_value': '', 'feature_set': '', 'ocid': '', 'license_type': '', 
+        'owner': '', 'created_on': ''}
 
     print('--> Scanning GOLDENGATE - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))

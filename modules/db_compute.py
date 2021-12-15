@@ -14,8 +14,7 @@ class DbCompute():
                    region TEXT NOT NULL,
                    compartment_id TEXT NOT NULL,
                    name TEXT NOT NULL,
-                   ad TEXT NOT NULL,
-                   lifecycle_state TEXT NOT NULL,
+                   ad TEXT NOT NULL,                   
                    shape TEXT NOT NULL,
                    ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
                    owner TEXT NOT NULL,
@@ -53,12 +52,12 @@ class DbCompute():
 
     def add_compute(self, compute_dict):        
         dml = '''
-           INSERT INTO compute (region, compartment_id, name, ad, lifecycle_state, 
-              shape, ocid, owner, created_on) 
-           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
+           INSERT INTO compute (region, compartment_id, name, ad, shape, 
+              ocid, owner, created_on) 
+           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
         ''' % (compute_dict['region'], compute_dict['compartment_id'], compute_dict['name'],
-        compute_dict['ad'], compute_dict['lifecycle_state'], compute_dict['shape'],
-        compute_dict['ocid'], compute_dict['owner'], compute_dict['created_on'],)       
+        compute_dict['ad'], compute_dict['shape'], compute_dict['ocid'], compute_dict['owner'], 
+        compute_dict['created_on'],)       
 
         self._cursor.execute(dml)
         self._conn.commit()

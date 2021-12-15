@@ -15,8 +15,7 @@ class DbAnalytics():
                 name TEXT NOT NULL,
                 capacity_type TEXT NOT NULL,
                 capacity_value INTEGER NOT NULL,
-                feature_set TEXT NOT NULL,
-                lifecycle_state TEXT NOT NULL,
+                feature_set TEXT NOT NULL,                
                 ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
                 license_type TEXT NOT NULL,
                 owner TEXT NOT NULL,
@@ -41,8 +40,8 @@ class DbAnalytics():
            VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
         ''' % (analytics_dict['region'], analytics_dict['compartment_id'], analytics_dict['name'],
         analytics_dict['capacity_type'], analytics_dict['capacity_value'], analytics_dict['feature_set'],
-        analytics_dict['lifecycle_state'],  analytics_dict['ocid'], analytics_dict['license_type'], 
-        analytics_dict['owner'], analytics_dict['created_on'],)
+        analytics_dict['ocid'], analytics_dict['license_type'], analytics_dict['owner'], 
+        analytics_dict['created_on'],)
 
         self._cursor.execute(dml)
         self._conn.commit()
