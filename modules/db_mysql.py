@@ -7,7 +7,7 @@ import sqlite3
 
 class DbMysql():
     def __init__(self, db_dir):        
-        adb_db_table = '''
+        mysql_db_table = '''
             CREATE TABLE IF NOT EXISTS mysql (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 region TEXT NOT NULL,
@@ -23,13 +23,15 @@ class DbMysql():
             );
         '''
         
-        odb_db_file = db_dir + '/mysql.db'        
+        mysql_db_file = db_dir + '/mysql.db'        
         
-        if not os.path.isfile(odb_db_file):            
-            self._db = sqlite3.connect(odb_db_file)
-            self._db.execute(adb_db_table)
+        if not os.path.isfile(mysql_db_file):
+            self._conn = sqlite3.connect(mysql_db_file)
+            self._cursor = self._conn.cursor()
+            self._cursor.execute(mysql_db_table)                
         else:
-            self._db = sqlite3.connect(odb_db_file)
+            self._conn = sqlite3.connect(mysql_db_file)
+            self._cursor = self._conn.cursor()
 
     def add(self, mysql_dict):        
         dml = '''
@@ -41,8 +43,10 @@ class DbMysql():
         mysql_dict['lifecycle_state'], mysql_dict['ocid'], mysql_dict['owner'], 
         mysql_dict['created_on'],)       
 
-        self._db.execute(dml)
-        self._db.commit()
+        self._cursor.execute(dml)
+        self._conn.commit()
+
+        return self._cursor.lastrowid
     
     def list(self, owner=None):
         if owner is not None:
@@ -54,8 +58,8 @@ class DbMysql():
                SELECT id, region, ocid, owner FROM mysql;
             '''
 
-        cursor = self._db.execute(dml)
-        mysql_list = cursor.fetchall()
+        self._cursor.execute(dml)
+        mysql_list = self._cursor.fetchall()
 
         return mysql_list
     
@@ -64,8 +68,8 @@ class DbMysql():
             DELETE FROM mysql WHERE id = %d;
         ''' % (id,)
 
-        self._db.execute(dml)
-        self._db.commit()
+        self._cursor.execute(dml)
+        self._conn.commit()
 
     def close(self):
         self._db.close()

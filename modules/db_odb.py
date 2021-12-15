@@ -7,7 +7,7 @@ import sqlite3
 
 class DbOdb():
     def __init__(self, db_dir):        
-        adb_db_table = '''
+        odb_db_table = '''
             CREATE TABLE IF NOT EXISTS odb (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 region TEXT NOT NULL,
@@ -24,11 +24,13 @@ class DbOdb():
         
         odb_db_file = db_dir + '/odb.db'        
         
-        if not os.path.isfile(odb_db_file):            
-            self._db = sqlite3.connect(odb_db_file)
-            self._db.execute(adb_db_table)
+        if not os.path.isfile(odb_db_file):
+            self._conn = sqlite3.connect(odb_db_file)
+            self._cursor = self._conn.cursor()
+            self._cursor.execute(odb_db_table)                    
         else:
-            self._db = sqlite3.connect(odb_db_file)
+            self._conn = sqlite3.connect(odb_db_file)
+            self._cursor = self._conn.cursor()
 
     def add(self, adb_dict):        
         dml = '''
@@ -39,16 +41,18 @@ class DbOdb():
         adb_dict['edition'], adb_dict['shape'], adb_dict['storage_gbs'],
         adb_dict['ocid'], adb_dict['owner'], adb_dict['created_on'],)       
 
-        self._db.execute(dml)
-        self._db.commit()  
+        self._cursor.execute(dml)
+        self._conn.commit()
+
+        return self._cursor.lastrowid
 
     def delete(self, id):
         dml = '''
             DELETE FROM odb WHERE id = %d;
         ''' % (id,)
 
-        self._db.execute(dml)
-        self._db.commit()
+        self._cursor.execute(dml)
+        self._conn.commit()
 
     def list(self, owner=None):
         if owner is not None:
@@ -60,10 +64,10 @@ class DbOdb():
                SELECT id, region, ocid, owner FROM odb;
             '''
 
-        cursor = self._db.execute(dml)
-        adb_list = cursor.fetchall()
+        self._cursor.execute(dml)
+        odb_list = self._cursor.fetchall()
 
-        return adb_list
+        return odb_list
 
     def close(self):
         self._db.close()

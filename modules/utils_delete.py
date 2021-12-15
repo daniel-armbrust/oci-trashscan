@@ -205,7 +205,34 @@ def fss(oci_config, db_dir, user_login_delete=None):
     """
     db = db_fss.DbFss(db_dir)
     
-    fss_ex_list = db.list_export(user_login_delete)
+    fss_snp_list = db.list_snapshots(user_login_delete)
+        
+    for export in fss_snp_list:
+        id = export[0]
+        region = export[1]
+        ocid = export[2]
+        owner = export[3]
+        
+        print('--> Deleting FSS (Snapshot) - OCID: %s | Owner: %s | Region: %s' % \
+            (ocid, owner, region,))
+        
+        oci_config['region'] = region
+
+        oci_fss = oci_filestorage.OciFileStorage(oci_config)   
+        exists = oci_fss.exists_snapshot(ocid)
+
+        if exists:
+            deleted = oci_fss.delete_snapshot(ocid)
+
+            if deleted:
+                db.delete_snapshot(id)
+            else:
+                print('\t!!! The resource was not deleted on OCI!\n')                
+        else:
+            db.delete_snapshot(id)
+
+
+    fss_ex_list = db.list_exports(user_login_delete)
         
     for export in fss_ex_list:
         id = export[0]
@@ -232,7 +259,7 @@ def fss(oci_config, db_dir, user_login_delete=None):
             db.delete_export(id)
     
 
-    fss_mt_list = db.list_mounttarget(user_login_delete)
+    fss_mt_list = db.list_mounttargets(user_login_delete)
 
     for mounttarget in fss_mt_list:
         id = mounttarget[0]
@@ -259,7 +286,7 @@ def fss(oci_config, db_dir, user_login_delete=None):
             db.delete_mounttarget(id)
 
 
-    fss_fs_list = db.list_filesystem(user_login_delete)
+    fss_fs_list = db.list_filesystems(user_login_delete)
 
     for filesystem in fss_fs_list:
         id = filesystem[0]

@@ -84,6 +84,29 @@ class OciFileStorage():
 
         return mt_list
     
+    def list_snapshots(self, filesystem_id):
+        """Lists snapshots of the specified file system.
+        
+        """
+        snapshot_list = []
+        next_page_id = None
+        invalid_lifecycle_state = ('DELETING', 'DELETED',)        
+
+        while True:
+            resp = self._fssclient.list_snapshots(file_system_id=filesystem_id, 
+                page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
+           
+            for resp_data in resp.data:
+                if resp_data.lifecycle_state not in invalid_lifecycle_state:
+                    snapshot_list.append(resp_data)
+                            
+            if resp.has_next_page:
+                next_page_id = resp.next_page
+            else:
+                break
+
+        return snapshot_list
+    
     def exists_filesystem(self, ocid):
         """Check if the specified filesystem exists.
 
@@ -92,6 +115,25 @@ class OciFileStorage():
         
         try:
             resp = self._fssclient.get_file_system(file_system_id=ocid,
+                retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
+        except ServiceError:
+            return False
+        
+        lifecycle_state = resp.data.lifecycle_state
+        
+        if lifecycle_state not in invalid_lifecycle_state:
+            return True
+        else:
+            return False
+    
+    def exists_snapshot(self, ocid):
+        """Check if the specified snapshot exists.
+
+        """
+        invalid_lifecycle_state = ('DELETING', 'DELETED',)
+        
+        try:
+            resp = self._fssclient.get_snapshot(snapshot_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -146,6 +188,18 @@ class OciFileStorage():
 
         """
         resp = self._fssclient.delete_file_system(file_system_id=ocid,
+            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
+        
+        if resp.status >= 200 and resp.status < 300:
+            return True
+        else:
+            return False
+    
+    def delete_snapshot(self, ocid):
+        """Delete the specified snapshot.
+
+        """
+        resp = self._fssclient.delete_snapshot(snapshot_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
         if resp.status >= 200 and resp.status < 300:

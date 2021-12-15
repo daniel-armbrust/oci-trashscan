@@ -96,17 +96,21 @@ def odb(oci_config, db_dir, compartment_props):
 
 
 def compute(oci_config, db_dir, compartment_props):
-    """Scan Compute Instances.
+    """Scan Compute Instances and Custom Images.
 
     """
     compute_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '',
         'lifecycle_state': '', 'shape': '', 'ocid': '', 'owner': '', 'created_on': ''}
+    
+    custom_img_dict = {'region': '', 'compartment_id': '', 'billable_size_in_gbs': 0,
+        'name': '', 'ocid': '', 'operating_system': '', 'operating_system_version': '',
+        'size_in_mbs': 0, 'owner': '', 'created_on': ''}
 
     print('--> Scanning COMPUTE INSTANCES - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
     
     oci_cpt = oci_compute.OciCompute(oci_config)
-    cpt_list = oci_cpt.list_instances(compartment_props.id)
+    cpt_list = oci_cpt.list_computes(compartment_props.id)    
 
     db = db_compute.DbCompute(db_dir)
 
@@ -125,7 +129,31 @@ def compute(oci_config, db_dir, compartment_props):
         except (AttributeError, KeyError,):
             pass
 
-        db.add(compute_dict)
+        db.add_compute(compute_dict)
+    
+    
+    print('--> Scanning CUSTOM IMAGES - Comp.: %s (%s) | Region: %s' % \
+        (compartment_props.id, compartment_props.name, oci_config['region'],))
+
+    custom_imgs_list = oci_cpt.list_custom_images(compartment_props.id)
+
+    for imgs_props in custom_imgs_list:
+        custom_img_dict['region'] = oci_config['region']
+        custom_img_dict['compartment_id'] = imgs_props.compartment_id
+        custom_img_dict['name'] = imgs_props.display_name
+        custom_img_dict['billable_size_in_gbs'] = imgs_props.billable_size_in_gbs
+        custom_img_dict['ocid'] = imgs_props.id
+        custom_img_dict['operating_system'] = imgs_props.operating_system
+        custom_img_dict['operating_system_version'] = imgs_props.operating_system_version        
+        custom_img_dict['size_in_mbs'] = imgs_props.size_in_mbs        
+
+        try:
+            custom_img_dict['owner'] = imgs_props.defined_tags['Oracle-Tags']['CreatedBy']
+            custom_img_dict['created_on'] = imgs_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except (AttributeError, KeyError,):
+            pass
+
+        db.add_custom_image(custom_img_dict)
 
     db.close()
 
@@ -218,6 +246,9 @@ def fss(oci_config, db_dir, compartment_props):
     fss_fs_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '',
         'ocid': '', 'owner': '', 'created_on': ''}
     
+    fss_snp_dict = {'region': '', 'file_system_id': '', 'name': '', 'provenance_id': '',
+        'ocid': '', 'owner': '', 'created_on': ''}
+    
     fss_exp_dict = {'region': '', 'compartment_id': '', 'export_set_id': '', 
         'file_system_id': '', 'ocid': ''}
     
@@ -235,21 +266,32 @@ def fss(oci_config, db_dir, compartment_props):
     fssfs_ad_list = []    
     fssmt_ad_list = []
     fssexp_list = []
+    fsssnp_list = []
 
     for ad in ad_list:
+        # FileStorage FileSystem
         fss_fs_list = oci_fss.list_filesystems(compartment_id=compartment_props.id, ad=ad)        
 
-        for resp in fss_fs_list:          
+        for resp in fss_fs_list:             
             fssfs_ad_list.append(resp)
+            fssfs_id = resp.id
 
+            # FileStorage SNAPSHOT
+            fss_snp_list = oci_fss.list_snapshots(fssfs_id)            
+
+            for resp in fss_snp_list:
+                fsssnp_list.append(resp)
+
+        # FileStorage MOUNTTARGET
         fss_mt_list = oci_fss.list_mounttargets(compartment_id=compartment_props.id, ad=ad)
 
         for resp in fss_mt_list:
             fssmt_ad_list.append(resp)
-    
-    fss_export_list = oci_fss.list_exports(compartment_id=compartment_props.id)
 
-    for resp in fss_export_list:            
+    # FileStorage EXPORTS 
+    fss_ex_list = oci_fss.list_exports(compartment_id=compartment_props.id)
+
+    for resp in fss_ex_list:            
         fssexp_list.append(resp)
     
     db = db_fss.DbFss(db_dir)
@@ -259,7 +301,7 @@ def fss(oci_config, db_dir, compartment_props):
         fss_fs_dict['compartment_id'] = fss_props.compartment_id
         fss_fs_dict['name'] = fss_props.display_name
         fss_fs_dict['ad'] = fss_props.availability_domain
-        fss_fs_dict['ocid'] = fss_props.id        
+        fss_fs_dict['ocid'] = fss_props.id     
 
         try:
             fss_fs_dict['owner'] = fss_props.defined_tags['Oracle-Tags']['CreatedBy']
@@ -269,6 +311,21 @@ def fss(oci_config, db_dir, compartment_props):
 
         db.add_filesystem(fss_fs_dict)
     
+    for fss_props in fsssnp_list:
+        fss_snp_dict['region'] = oci_config['region']
+        fss_snp_dict['file_system_id'] = fss_props.file_system_id
+        fss_snp_dict['name'] = fss_props.name
+        fss_snp_dict['provenance_id'] = fss_props.provenance_id
+        fss_snp_dict['ocid'] = fss_props.id        
+
+        try:
+            fss_snp_dict['owner'] = fss_props.defined_tags['Oracle-Tags']['CreatedBy']
+            fss_snp_dict['created_on'] = fss_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except (AttributeError, KeyError,):
+            pass
+
+        db.add_snapshot(fss_snp_dict)
+
     for fss_props in fssexp_list:
         fss_exp_dict['region'] = oci_config['region']
         fss_exp_dict['compartment_id'] = fss_props.compartment_id
@@ -281,7 +338,7 @@ def fss(oci_config, db_dir, compartment_props):
     for fss_props in fssmt_ad_list:
         fss_mt_dict['region'] = oci_config['region']
         fss_mt_dict['compartment_id'] = fss_props.compartment_id
-        fss_mt_dict['name'] = fss_props.name
+        fss_mt_dict['name'] = fss_props.display_name
         fss_mt_dict['ad'] = fss_props.availability_domain
         fss_mt_dict['subnet_id'] = fss_props.subnet_id
         fss_mt_dict['ocid'] = fss_props.id        

@@ -26,11 +26,13 @@ class DbAdb():
         
         adb_db_file = db_dir + '/adb.db'        
         
-        if not os.path.isfile(adb_db_file):            
-            self._db = sqlite3.connect(adb_db_file)
-            self._db.execute(adb_db_table)
+        if not os.path.isfile(adb_db_file):
+            self._conn = sqlite3.connect(adb_db_file)
+            self._cursor = self._conn.cursor()
+            self._cursor.execute(adb_db_table)
         else:
-            self._db = sqlite3.connect(adb_db_file)
+            self._conn = sqlite3.connect(adb_db_file)
+            self._cursor = self._conn.cursor()
 
     def add(self, adb_dict):
         dml = '''
@@ -42,16 +44,18 @@ class DbAdb():
         adb_dict['workload_type'],  adb_dict['lifecycle_state'], adb_dict['ocid'], 
         adb_dict['owner'], adb_dict['created_on'],)
 
-        self._db.execute(dml)
-        self._db.commit()
+        self._cursor.execute(dml)
+        self._conn.commit()
+
+        return self._cursor.lastrowid
     
     def delete(self, id):
         dml = '''
             DELETE FROM adb WHERE id = %d;
         ''' % (id,)
 
-        self._db.execute(dml)
-        self._db.commit()
+        self._cursor.execute(dml)
+        self._conn.commit()
 
     def list(self, owner=None):
         if owner is not None:
@@ -62,9 +66,9 @@ class DbAdb():
             dml = '''
                SELECT id, region, ocid, owner FROM adb;
             '''
-
-        cursor = self._db.execute(dml)
-        adb_list = cursor.fetchall()
+        
+        self._cursor.execute(dml)
+        adb_list = self._cursor.fetchall()
 
         return adb_list
 

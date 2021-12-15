@@ -26,11 +26,13 @@ class DbAnalytics():
         
         analytics_db_file = db_dir + '/analytics.db'        
         
-        if not os.path.isfile(analytics_db_file):            
-            self._db = sqlite3.connect(analytics_db_file)
-            self._db.execute(analytics_db_table)
+        if not os.path.isfile(analytics_db_file):
+            self._conn = sqlite3.connect(analytics_db_file)
+            self._cursor = self._conn.cursor()
+            self._cursor.execute(analytics_db_table)
         else:
-            self._db = sqlite3.connect(analytics_db_file)
+            self._conn = sqlite3.connect(analytics_db_file)
+            self._cursor = self._conn.cursor()
 
     def add(self, analytics_dict):
         dml = '''
@@ -42,8 +44,10 @@ class DbAnalytics():
         analytics_dict['lifecycle_state'],  analytics_dict['ocid'], analytics_dict['license_type'], 
         analytics_dict['owner'], analytics_dict['created_on'],)
 
-        self._db.execute(dml)
-        self._db.commit()
+        self._cursor.execute(dml)
+        self._conn.commit()
+
+        return self._cursor.lastrowid
 
     def close(self):
         self._db.close()
