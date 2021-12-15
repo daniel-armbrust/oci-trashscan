@@ -34,7 +34,7 @@ def adb(oci_config, db_dir, compartment_props):
         (compartment_props.id, compartment_props.name, oci_config['region'],))
 
     oci_db = oci_database.OciDatabase(oci_config)    
-    adb_list = oci_db.list_adb(compartment_props.id)
+    adb_list = oci_db.list_adbs(compartment_props.id)
     
     db = db_adb.DbAdb(db_dir)
 
@@ -71,7 +71,7 @@ def odb(oci_config, db_dir, compartment_props):
         (compartment_props.id, compartment_props.name, oci_config['region'],))
       
     oci_db = oci_database.OciDatabase(oci_config)    
-    odb_list = oci_db.list_odb(compartment_props.id)
+    odb_list = oci_db.list_odbs(compartment_props.id)
     
     db = db_odb.DbOdb(db_dir)
 
@@ -129,13 +129,26 @@ def compute(oci_config, db_dir, compartment_props):
         except (AttributeError, KeyError,):
             pass
 
-        db.add_compute(compute_dict)
-    
-    
+        db.add_compute(compute_dict)   
+
+    db.close()
+
+
+def custom_image(oci_config, db_dir, compartment_props):
+    """Scan Custom Images.
+
+    """
+    custom_img_dict = {'region': '', 'compartment_id': '', 'billable_size_in_gbs': 0,
+        'name': '', 'ocid': '', 'operating_system': '', 'operating_system_version': '',
+        'size_in_mbs': 0, 'owner': '', 'created_on': ''}
+
     print('--> Scanning CUSTOM IMAGES - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
-
+    
+    oci_cpt = oci_compute.OciCompute(oci_config)
     custom_imgs_list = oci_cpt.list_custom_images(compartment_props.id)
+
+    db = db_compute.DbCompute(db_dir)
 
     for imgs_props in custom_imgs_list:
         custom_img_dict['region'] = oci_config['region']
@@ -163,8 +176,8 @@ def blockstorage(oci_config, db_dir, compartment_props):
 
     """
     blockstorage_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '', 
-        'lifecycle_state': '', 'size_gbs': 0, 'size_mbs': 0, 'vpus_per_gb': 0,
-        'ocid': '', 'replica_id': '', 'replica_ad': '', 'owner': '', 'created_on': ''}
+        'size_gbs': 0, 'size_mbs': 0, 'vpus_per_gb': 0, 'ocid': '', 'replica_id': '', 
+        'replica_ad': '', 'owner': '', 'created_on': ''}
 
     print('--> Scanning BLOCK STORAGE - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
@@ -178,8 +191,7 @@ def blockstorage(oci_config, db_dir, compartment_props):
         blockstorage_dict['region'] = oci_config['region']
         blockstorage_dict['compartment_id'] = blkstr_props.compartment_id
         blockstorage_dict['name'] = blkstr_props.display_name
-        blockstorage_dict['ad'] = blkstr_props.availability_domain
-        blockstorage_dict['lifecycle_state'] = blkstr_props.lifecycle_state
+        blockstorage_dict['ad'] = blkstr_props.availability_domain        
         blockstorage_dict['size_gbs'] = blkstr_props.size_in_gbs
         blockstorage_dict['size_mbs'] = blkstr_props.size_in_mbs
         blockstorage_dict['vpus_per_gb'] = blkstr_props.vpus_per_gb
@@ -212,7 +224,7 @@ def mysql(oci_config, db_dir, compartment_props):
         (compartment_props.id, compartment_props.name, oci_config['region'],))
     
     oci_db = oci_database.OciDatabase(oci_config)    
-    mysql_list = oci_db.list_mysql(compartment_props.id)
+    mysql_list = oci_db.list_mysqls(compartment_props.id)
     
     db = db_mysql.DbMysql(db_dir)
 

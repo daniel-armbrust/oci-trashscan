@@ -60,7 +60,6 @@ class OciCompute():
            
         return images_list
 
-
     def exists_compute(self, ocid):
         """Check if the compute exists.
         
@@ -95,6 +94,18 @@ class OciCompute():
         lifecycle_state = resp.data.lifecycle_state
         
         if lifecycle_state not in invalid_lifecycle_state:
+            return True
+        else:
+            return False
+
+    def delete_custom_image(self, ocid):
+        """Delete the specified Custom Image.
+
+        """
+        resp = self._cptclient.delete_image(image_id=ocid,
+            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
+        
+        if resp.status >= 200 and resp.status < 300:
             return True
         else:
             return False

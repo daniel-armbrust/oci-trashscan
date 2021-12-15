@@ -13,8 +13,7 @@ class DbBlockStorage():
                 region TEXT NOT NULL,
                 compartment_id TEXT NOT NULL,
                 name TEXT NOT NULL,
-                ad TEXT NOT NULL,
-                lifecycle_state TEXT NOT NULL,
+                ad TEXT NOT NULL,                
                 size_gbs INTEGER NOT NULL,
                 size_mbs INTEGER NOT NULL,
                 vpus_per_gb INTEGER NOT NULL,
@@ -38,12 +37,12 @@ class DbBlockStorage():
 
     def add(self, blockstorage_dict):        
         dml = '''
-           INSERT INTO blockstorage (region, compartment_id, name, ad, lifecycle_state, 
+           INSERT INTO blockstorage (region, compartment_id, name, ad, 
               size_gbs, size_mbs, vpus_per_gb, replica_id, replica_ad, ocid, owner, created_on) 
-           VALUES ("%s", "%s", "%s", "%s", "%s", "%d", "%d", "%d", "%s", "%s", "%s", "%s", "%s");
+           VALUES ("%s", "%s", "%s", "%s", "%d", "%d", "%d", "%s", "%s", "%s", "%s", "%s");
         ''' % (blockstorage_dict['region'], blockstorage_dict['compartment_id'], 
-        blockstorage_dict['name'], blockstorage_dict['ad'], blockstorage_dict['lifecycle_state'],
-        blockstorage_dict['size_gbs'], blockstorage_dict['size_mbs'], blockstorage_dict['vpus_per_gb'],
+        blockstorage_dict['name'], blockstorage_dict['ad'], blockstorage_dict['size_gbs'], 
+        blockstorage_dict['size_mbs'], blockstorage_dict['vpus_per_gb'],
         blockstorage_dict['replica_id'], blockstorage_dict['replica_ad'], blockstorage_dict['ocid'], 
         blockstorage_dict['owner'], blockstorage_dict['created_on'],)
 
@@ -70,10 +69,10 @@ class DbBlockStorage():
                SELECT id, region, ocid, replica_id, replica_ad, owner FROM blockstorage;
             '''
         self._cursor.execute(dml)
-        blockstorage_list = self._cursor.fetchall()
+        blockstorages_list = self._cursor.fetchall()
 
-        return blockstorage_list
+        return blockstorages_list
 
     def close(self):
-        self._db.close()
+        self._conn.close()
     

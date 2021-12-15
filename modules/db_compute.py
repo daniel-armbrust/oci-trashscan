@@ -110,6 +110,21 @@ class DbCompute():
         computes_list = self._cursor.fetchall()
 
         return computes_list
+    
+    def list_custom_images(self, owner=None):
+        if owner is not None:
+            dml = '''
+               SELECT id, region, ocid, owner FROM custom_img WHERE owner LIKE "%%%s";
+            ''' % (owner,)            
+        else:
+            dml = '''
+               SELECT id, region, ocid, owner FROM custom_img;
+            '''
+
+        self._cursor.execute(dml)
+        custom_imgs_list = self._cursor.fetchall()
+
+        return custom_imgs_list
 
     def close(self):
-        self._db.close()
+         self._conn.close()

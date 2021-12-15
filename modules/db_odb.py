@@ -65,9 +65,9 @@ class DbOdb():
             '''
 
         self._cursor.execute(dml)
-        odb_list = self._cursor.fetchall()
+        odbs_list = self._cursor.fetchall()
 
-        return odb_list
+        return odbs_list
 
     def close(self):
-        self._db.close()
+        self._conn.close()

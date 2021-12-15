@@ -18,13 +18,15 @@ class OciOke():
         """
         cluster_list = []
         next_page_id = None
+        invalid_lifecycle_state = ('DELETING', 'DELETED',)        
         
         while True:
             resp = self._okeclient.list_clusters(compartment_id=compartment_id, 
                 page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
-                cluster_list.append(resp_data)
+                if resp_data.lifecycle_state not in invalid_lifecycle_state:
+                    cluster_list.append(resp_data)
             
             if resp.has_next_page:
                 next_page_id = resp.next_page

@@ -68,9 +68,9 @@ class DbAdb():
             '''
         
         self._cursor.execute(dml)
-        adb_list = self._cursor.fetchall()
+        adbs_list = self._cursor.fetchall()
 
-        return adb_list
+        return adbs_list
 
     def close(self):
-        self._db.close()
+        self._conn.close()

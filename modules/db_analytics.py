@@ -50,4 +50,4 @@ class DbAnalytics():
         return self._cursor.lastrowid
 
     def close(self):
-        self._db.close()
+        self._conn.close()

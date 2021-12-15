@@ -20,13 +20,15 @@ class OciBlockStorage():
         """
         blkvol_list = []
         next_page_id = None
+        invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
         
         while True:
             resp = self._blkstrclient.list_volumes(compartment_id, page=next_page_id,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
-                blkvol_list.append(resp_data)
+                if resp_data.lifecycle_state not in invalid_lifecycle_state:
+                    blkvol_list.append(resp_data)
             
             if resp.has_next_page:
                 next_page_id = resp.next_page

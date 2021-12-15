@@ -21,9 +21,9 @@ def adb(oci_config, db_dir, user_login_delete=None):
     """
     db = db_adb.DbAdb(db_dir)
 
-    adb_list = db.list(user_login_delete)
+    adbs_list = db.list(user_login_delete)
 
-    for adb in adb_list:
+    for adb in adbs_list:
         id = adb[0]
         region = adb[1]
         ocid = adb[2]
@@ -56,9 +56,9 @@ def odb(oci_config, db_dir, user_login_delete=None):
     """
     db = db_adb.DbOdb(db_dir)
 
-    odb_list = db.list(user_login_delete)
+    odbs_list = db.list(user_login_delete)
 
-    for odb in odb_list:
+    for odb in odbs_list:
         id = odb[0]
         region = odb[1]
         ocid = odb[2]
@@ -91,31 +91,66 @@ def compute(oci_config, db_dir, user_login_delete=None):
     """
     db = db_compute.DbCompute(db_dir)
 
-    compute_list = db.list(user_login_delete)
+    computes_list = db.list_computes(user_login_delete)
 
-    for compute in compute_list:
+    for compute in computes_list:
         id = compute[0]
         region = compute[1]
         ocid = compute[2]
         owner = compute[3]
 
-        print('--> Deleting COMPUTE INSTANCES - OCID: %s | Owner: %s | Region: %s' % \
+        print('--> Deleting COMPUTE INSTANCE - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
         
         oci_config['region'] = region
 
         oci_cpt = oci_compute.OciCompute(oci_config)
-        exists = oci_cpt.exists(ocid)
+        exists = oci_cpt.exists_compute(ocid)
 
         if exists:
             deleted = oci_cpt.terminate(ocid)
 
             if deleted:
-                db.delete(id)
+                db.delete_compute(id)
             else:
                 print('\t!!! The resource was not deleted on OCI!\n')                
         else:
-            db.delete(id)
+            db.delete_compute(id)
+    
+    db.close()
+
+
+def custom_image(oci_config, db_dir, user_login_delete=None):
+    """Delete Custom Images.
+
+    """
+    db = db_compute.DbCompute(db_dir)
+
+    custom_imgs_list = db.list_custom_images(user_login_delete)
+
+    for custom_img in custom_imgs_list:
+        id = custom_img[0]
+        region = custom_img[1]
+        ocid = custom_img[2]
+        owner = custom_img[3]
+
+        print('--> Deleting CUSTOM IMAGE - OCID: %s | Owner: %s | Region: %s' % \
+            (ocid, owner, region,))
+        
+        oci_config['region'] = region
+
+        oci_cimage = oci_compute.OciCompute(oci_config)
+        exists = oci_cimage.exists_custom_image(ocid)
+
+        if exists:
+            deleted = oci_cimage.delete_custom_image(ocid)
+
+            if deleted:
+                db.delete_custom_image(id)
+            else:
+                print('\t!!! The resource was not deleted on OCI!\n')                
+        else:
+            db.delete_custom_image(id)
     
     db.close()
 

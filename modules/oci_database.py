@@ -15,12 +15,13 @@ class OciDatabase():
         self._oci_config = oci_config
         self._timeout = timeout      
       
-    def list_adb(self, compartment_id):
+    def list_adbs(self, compartment_id):
         """List all Autonomous Databases from the specified compartment.
 
         """
         adb_list = []
         next_page_id = None
+        invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
 
         dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)
 
@@ -29,7 +30,8 @@ class OciDatabase():
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)          
            
             for resp_data in resp.data:
-                adb_list.append(resp_data)
+                if resp_data.lifecycle_state not in invalid_lifecycle_state:
+                    adb_list.append(resp_data)
             
             if resp.has_next_page:
                 next_page_id = resp.next_page
@@ -73,12 +75,14 @@ class OciDatabase():
         else:
             return False                
 
-    def list_odb(self, compartment_id):
+    def list_odbs(self, compartment_id):
         """List all Oracle Databases from the specified compartment.
 
         """
         odb_list = []
         next_page_id = None
+        invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
+        
 
         dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)
         
@@ -86,7 +90,8 @@ class OciDatabase():
             resp = dbclient.list_db_systems(compartment_id, page=next_page_id)          
            
             for resp_data in resp.data:
-                odb_list.append(resp_data)
+                if resp_data.lifecycle_state not in invalid_lifecycle_state:
+                    odb_list.append(resp_data)
             
             if resp.has_next_page:
                 next_page_id = resp.next_page
@@ -130,12 +135,13 @@ class OciDatabase():
         else:
             return False                
 
-    def list_mysql(self, compartment_id):
+    def list_mysqls(self, compartment_id):
         """List all MySQL DB Systems in the specified compartment.
         
         """
         mysql_list = []
         next_page_id = None
+        invalid_lifecycle_state = ('DELETING', 'DELETED',)        
 
         dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)
 
@@ -143,7 +149,8 @@ class OciDatabase():
             resp = dbclient.list_db_systems(compartment_id, page=next_page_id)          
            
             for resp_data in resp.data:
-                mysql_list.append(resp_data)
+                if resp_data.lifecycle_state not in invalid_lifecycle_state:
+                    mysql_list.append(resp_data)
             
             if resp.has_next_page:
                 next_page_id = resp.next_page

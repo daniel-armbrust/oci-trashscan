@@ -61,7 +61,8 @@ def start_trash_delete(oci_config_file, db_dir, user_login_delete):
 
     """
     #service_func_list = [utils_delete.adb, utils_delete.odb, utils_delete.compute,
-    #     utils_delete.blockstorage, utils_delete.mysql, utils_delete.fss]
+    #     utils_delete.custom_image, utils_delete.blockstorage, utils_delete.mysql, 
+    #     utils_delete.fss, utils_delete.oke, utils_delete.analytics, utils_scan.goldengate]
     service_func_list = [utils_delete.adb]
 
     logo()

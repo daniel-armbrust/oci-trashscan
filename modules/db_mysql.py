@@ -72,4 +72,4 @@ class DbMysql():
         self._conn.commit()
 
     def close(self):
-        self._db.close()
+        self._conn.close()
