@@ -26,8 +26,8 @@ def adb(oci_config, db_dir, user_login_delete=None):
     for adb in adbs_list:
         id = adb[0]
         region = adb[1]
-        ocid = adb[2]
-        owner = adb[3]
+        ocid = adb[8]
+        owner = adb[9]
 
         print('--> Deleting AUTONOMOUS DATABASE (adb) - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # trash-delete.py
 #
@@ -5,11 +6,8 @@
 import sys
 import os
 import getopt
-from multiprocessing import Process
 
-import oci
-
-from modules import oci_identity
+from oci import config as oci_config
 from modules import utils_delete
 
 #
@@ -50,8 +48,8 @@ def show_help():
 
 
 def init_oci_sdk(config_file='~/.oci/config', region=None):    
-    config = oci.config.from_file(file_location=config_file)    
-    oci.config.validate_config(config)
+    config = oci_config.from_file(file_location=config_file)    
+    oci_config.validate_config(config)
     
     return config
 
@@ -63,15 +61,17 @@ def start_trash_delete(oci_config_file, db_dir, user_login_delete):
     #service_func_list = [utils_delete.adb, utils_delete.odb, utils_delete.compute,
     #     utils_delete.custom_image, utils_delete.blockstorage, utils_delete.mysql, 
     #     utils_delete.fss, utils_delete.oke, utils_delete.analytics, utils_scan.goldengate]
-    service_func_list = [utils_delete.fss]
+    service_func_list = [utils_delete.adb, utils_delete.odb, utils_delete.compute,
+        utils_delete.custom_image, utils_delete.blockstorage, utils_delete.mysql,
+        utils_delete.fss]
 
     logo()
     print('*** Starting DELETING resources...\n')
 
-    oci_config = init_oci_sdk(oci_config_file)
+    config = init_oci_sdk(oci_config_file)
 
-    for service_func in service_func_list:
-        service_func(oci_config, db_dir, user_login_delete)
+    for service_func in service_func_list:        
+        service_func(config, db_dir, user_login_delete)
 
 
 def main(argv):

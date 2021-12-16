@@ -58,12 +58,14 @@ class DbAdb():
 
     def list(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM adb WHERE owner LIKE "%%%s";
+            dml = '''            
+               SELECT id, region, compartment_id, name, ocpu, storage_gbs, storage_tbs, 
+                  workload_type, ocid, owner, created_on FROM adb WHERE owner LIKE "%%%s";               
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM adb;
+            SELECT id, region, compartment_id, name, ocpu, storage_gbs, storage_tbs, 
+                  workload_type, ocid, owner, created_on FROM adb;
             '''
         
         self._cursor.execute(dml)
