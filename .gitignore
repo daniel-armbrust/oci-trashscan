@@ -1,6 +1,7 @@
 # Trash-Scan files to ignore
 oci_config
 *.db
+*.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
