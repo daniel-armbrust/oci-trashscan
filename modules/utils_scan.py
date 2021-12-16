@@ -253,13 +253,10 @@ def fss(oci_config, db_dir, compartment_props):
         'ocid': '', 'owner': '', 'created_on': ''}
     
     fss_snp_dict = {'region': '', 'file_system_id': '', 'name': '', 'provenance_id': '',
-        'ocid': '', 'owner': '', 'created_on': ''}
-    
-    fss_exp_dict = {'region': '', 'compartment_id': '', 'export_set_id': '', 
-        'file_system_id': '', 'ocid': ''}
-    
+        'ocid': '', 'owner': '', 'created_on': ''}   
+      
     fss_mt_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '',
-        'subnet_id': '', 'ocid': ''}
+        'subnet_id': '', 'ocid': '', 'owner': '', 'created_on': ''}
 
     print('--> Scanning FSS - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
@@ -270,8 +267,7 @@ def fss(oci_config, db_dir, compartment_props):
     oci_fss = oci_filestorage.OciFileStorage(oci_config)   
 
     fssfs_ad_list = []    
-    fssmt_ad_list = []
-    fssexp_list = []
+    fssmt_ad_list = []    
     fsssnp_list = []
 
     for ad in ad_list:
@@ -285,7 +281,7 @@ def fss(oci_config, db_dir, compartment_props):
             # FileStorage SNAPSHOT
             fss_snp_list = oci_fss.list_snapshots(fssfs_id)            
 
-            for resp in fss_snp_list:
+            for resp in fss_snp_list:                
                 fsssnp_list.append(resp)
 
         # FileStorage MOUNTTARGET
@@ -293,12 +289,6 @@ def fss(oci_config, db_dir, compartment_props):
 
         for resp in fss_mt_list:
             fssmt_ad_list.append(resp)
-
-    # FileStorage EXPORTS 
-    fss_ex_list = oci_fss.list_exports(compartment_id=compartment_props.id)
-
-    for resp in fss_ex_list:            
-        fssexp_list.append(resp)
     
     db = db_fss.DbFss(db_dir)
 
@@ -331,16 +321,7 @@ def fss(oci_config, db_dir, compartment_props):
             pass
 
         db.add_snapshot(fss_snp_dict)
-
-    for fss_props in fssexp_list:
-        fss_exp_dict['region'] = oci_config['region']
-        fss_exp_dict['compartment_id'] = fss_props.compartment_id
-        fss_exp_dict['export_set_id'] = fss_props.export_set_id
-        fss_exp_dict['file_system_id'] = fss_props.file_system_id
-        fss_exp_dict['ocid'] = fss_props.id        
-
-        db.add_export(fss_exp_dict)
-    
+        
     for fss_props in fssmt_ad_list:
         fss_mt_dict['region'] = oci_config['region']
         fss_mt_dict['compartment_id'] = fss_props.compartment_id
@@ -348,6 +329,12 @@ def fss(oci_config, db_dir, compartment_props):
         fss_mt_dict['ad'] = fss_props.availability_domain
         fss_mt_dict['subnet_id'] = fss_props.subnet_id
         fss_mt_dict['ocid'] = fss_props.id        
+
+        try:
+            fss_mt_dict['owner'] = fss_props.defined_tags['Oracle-Tags']['CreatedBy']
+            fss_mt_dict['created_on'] = fss_props.defined_tags['Oracle-Tags']['CreatedOn']
+        except (AttributeError, KeyError,):
+            pass
 
         db.add_mounttarget(fss_mt_dict)
     

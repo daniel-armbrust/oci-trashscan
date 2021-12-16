@@ -54,7 +54,7 @@ def odb(oci_config, db_dir, user_login_delete=None):
     """Delete Oracle Datbases.
 
     """
-    db = db_adb.DbOdb(db_dir)
+    db = db_odb.DbOdb(db_dir)
 
     odbs_list = db.list(user_login_delete)
 
@@ -242,11 +242,11 @@ def fss(oci_config, db_dir, user_login_delete=None):
     
     fss_snp_list = db.list_snapshots(user_login_delete)
         
-    for export in fss_snp_list:
-        id = export[0]
-        region = export[1]
-        ocid = export[2]
-        owner = export[3]
+    for snapshot in fss_snp_list:
+        id = snapshot[0]
+        region = snapshot[1]
+        ocid = snapshot[2]
+        owner = snapshot[3]
         
         print('--> Deleting FSS (Snapshot) - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -264,35 +264,7 @@ def fss(oci_config, db_dir, user_login_delete=None):
             else:
                 print('\t!!! The resource was not deleted on OCI!\n')                
         else:
-            db.delete_snapshot(id)
-
-
-    fss_ex_list = db.list_exports(user_login_delete)
-        
-    for export in fss_ex_list:
-        id = export[0]
-        region = export[1]
-        ocid = export[2]
-        owner = export[3]
-        
-        print('--> Deleting FSS (Export) - OCID: %s | Owner: %s | Region: %s' % \
-            (ocid, owner, region,))
-        
-        oci_config['region'] = region
-
-        oci_fss = oci_filestorage.OciFileStorage(oci_config)   
-        exists = oci_fss.exists_export(ocid)
-
-        if exists:
-            deleted = oci_fss.delete_export(ocid)
-
-            if deleted:
-                db.delete_export(id)
-            else:
-                print('\t!!! The resource was not deleted on OCI!\n')                
-        else:
-            db.delete_export(id)
-    
+            db.delete_snapshot(id)    
 
     fss_mt_list = db.list_mounttargets(user_login_delete)
 

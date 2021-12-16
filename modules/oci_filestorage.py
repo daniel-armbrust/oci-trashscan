@@ -34,33 +34,8 @@ class OciFileStorage():
             else:
                 break
 
-        return filesystem_list
-    
-    def list_exports(self, compartment_id):
-        """List all export resources in the specified compartment.
-        
-        """
-        exports_list = []
-        next_page_id = None
-        invalid_lifecycle_state = ('DELETING', 'DELETED',)        
-
-        while True:
-            resp = self._fssclient.list_exports(compartment_id=compartment_id, 
-                page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
-           
-            for resp_data in resp.data:
-                resp_data.compartment_id = compartment_id
-
-                if resp_data.lifecycle_state not in invalid_lifecycle_state:
-                    exports_list.append(resp_data)
-                                        
-            if resp.has_next_page:
-                next_page_id = resp.next_page
-            else:
-                break
-
-        return exports_list
-    
+        return filesystem_list   
+       
     def list_mounttargets(self, compartment_id, ad):
         """List all mount target resources in the specified compartment.
         
@@ -163,25 +138,6 @@ class OciFileStorage():
             return True
         else:
             return False
-
-    def exists_export(self, ocid):
-        """Check if the specified export exists.
-
-        """
-        invalid_lifecycle_state = ('DELETING', 'DELETED',)
-        
-        try:
-            resp = self._fssclient.get_export(export_id=ocid,
-                retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
-        except ServiceError:
-            return False
-        
-        lifecycle_state = resp.data.lifecycle_state
-        
-        if lifecycle_state not in invalid_lifecycle_state:
-            return True
-        else:
-            return False
     
     def delete_filesystem(self, ocid):
         """Delete the specified filesystem.
@@ -217,18 +173,5 @@ class OciFileStorage():
         if resp.status >= 200 and resp.status < 300:
             return True
         else:
-            return False
-
-    def delete_export(self, ocid):
-        """Delete the specified mount target.
-
-        """
-        resp = self._fssclient.delete_export(export_id=ocid,
-            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
-        
-        if resp.status >= 200 and resp.status < 300:
-            return True
-        else:
-            return False
-        
-    
+            return False         
+   

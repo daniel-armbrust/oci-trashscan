@@ -25,32 +25,24 @@ class DbFss():
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 region TEXT NOT NULL,
                 ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
-                name TEXT NOT NULL,
+                name TEXT NOT NULL,                
+                file_system_id TEXT NOT NULL,
+                provenance_id TEXT NOT NULL,
                 owner TEXT NOT NULL,
-                created_on TEXT NOT NULL,
-                file_system_id TEXT NOT NULL,
-                provenance_id TEXT NOT NULL
+                created_on TEXT NOT NULL                
             );
-            ''',
-            '''
-             CREATE TABLE IF NOT EXISTS fss_export (
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                region TEXT NOT NULL,
-                compartment_id TEXT NOT NULL,
-                export_set_id TEXT NOT NULL,
-                file_system_id TEXT NOT NULL,
-                ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE
-            );
-            ''',
+            ''',          
             '''
              CREATE TABLE IF NOT EXISTS fss_mounttarget (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 region TEXT NOT NULL,
-                compartment_id TEXT NOT NULL,
+                compartment_id TEXT NOT NULL,                
                 name TEXT NOT NULL,
                 ad TEXT NOT NULL,
                 ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
-                subnet_id TEXT NOT NULL
+                subnet_id TEXT NOT NULL,
+                owner TEXT NOT NULL,
+                created_on TEXT NOT NULL                
             );
             '''
         ]    
@@ -81,22 +73,12 @@ class DbFss():
     
     def add_snapshot(self, fss_snp_dict):        
         dml = '''
-           INSERT INTO fss_snapshot (region, ocid, name, owner, created_on, file_system_id, provenance_id) 
-           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s");
+           INSERT INTO fss_snapshot (region, ocid, name, owner, created_on, file_system_id, owner,
+               provenance_id) 
+           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
         ''' % (fss_snp_dict['region'], fss_snp_dict['ocid'], fss_snp_dict['name'], fss_snp_dict['owner'],
-        fss_snp_dict['created_on'], fss_snp_dict['file_system_id'], fss_snp_dict['provenance_id'],)       
-
-        self._cursor.execute(dml)
-        self._conn.commit()
-
-        return self._cursor.lastrowid
-    
-    def add_export(self, fss_exp_dict):        
-        dml = '''
-           INSERT INTO fss_export (region, compartment_id, export_set_id, file_system_id, ocid) 
-           VALUES ("%s", "%s", "%s", "%s", "%s");
-        ''' % (fss_exp_dict['region'], fss_exp_dict['compartment_id'], fss_exp_dict['export_set_id'],        
-        fss_exp_dict['file_system_id'], fss_exp_dict['ocid'],)       
+        fss_snp_dict['created_on'], fss_snp_dict['file_system_id'], fss_snp_dict['owner'],
+        fss_snp_dict['provenance_id'],)       
 
         self._cursor.execute(dml)
         self._conn.commit()
@@ -105,10 +87,12 @@ class DbFss():
     
     def add_mounttarget(self, fss_mt_dict):        
         dml = '''
-           INSERT INTO fss_mounttarget (region, compartment_id, name, ad, ocid, subnet_id) 
-           VALUES ("%s", "%s", "%s", "%s", "%s", "%s");
+           INSERT INTO fss_mounttarget (region, compartment_id, name, ad, ocid, subnet_id,
+               owner, created_on) 
+           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
         ''' % (fss_mt_dict['region'], fss_mt_dict['compartment_id'], fss_mt_dict['name'],        
-        fss_mt_dict['ad'], fss_mt_dict['ocid'], fss_mt_dict['subnet_id'],)       
+        fss_mt_dict['ad'], fss_mt_dict['ocid'], fss_mt_dict['subnet_id'], fss_mt_dict['owner'],
+        fss_mt_dict['created_on'],)       
 
         self._cursor.execute(dml)
         self._conn.commit()
@@ -144,22 +128,7 @@ class DbFss():
         snapshots_list = self._cursor.fetchall()
 
         return snapshots_list
-
-    def list_exports(self, owner=None):
-        if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM fss_export WHERE owner LIKE "%%%s";
-            ''' % (owner,)            
-        else:
-            dml = '''
-               SELECT id, region, ocid, owner FROM fss_export;
-            '''
-
-        self._cursor.execute(dml)
-        exports_list = self._cursor.fetchall()
-
-        return exports_list
-    
+       
     def list_mounttargets(self, owner=None):
         if owner is not None:
             dml = '''
@@ -198,14 +167,6 @@ class DbFss():
 
         self._cursor.execute(dml)
         self._conn.commit()
-    
-    def delete_export(self, id):
-        dml = '''
-            DELETE FROM fss_export WHERE id = %d;
-        ''' % (id,)
-
-        self._cursor.execute(dml)
-        self._conn.commit()
-
+      
     def close(self):
         self._conn.close()   
