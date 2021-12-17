@@ -101,12 +101,14 @@ class DbFss():
     
     def list_filesystems(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM fss_filesystem WHERE owner LIKE "%%%s";
+            dml = '''             
+               SELECT id, region, compartment_id, name, ad, ocid, owner, created_on 
+               FROM fss_filesystem WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM fss_filesystem;
+               SELECT id, region, compartment_id, name, ad, ocid, owner, created_on 
+               FROM fss_filesystem;
             '''
 
         self._cursor.execute(dml)
@@ -116,12 +118,14 @@ class DbFss():
     
     def list_snapshots(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM fss_snapshot WHERE owner LIKE "%%%s";
+            dml = '''             
+               SELECT id, region, ocid, name, file_system_id, provenance_id, owner, created_on
+               FROM fss_snapshot WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM fss_snapshot;
+               SELECT id, region, ocid, name, file_system_id, provenance_id, owner, created_on
+               FROM fss_snapshot;
             '''
 
         self._cursor.execute(dml)
@@ -131,12 +135,14 @@ class DbFss():
        
     def list_mounttargets(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM fss_mounttarget WHERE owner LIKE "%%%s";
+            dml = '''             
+               SELECT id, region, compartment_id, name, ad, ocid, subnet_id, owner, 
+                  created_on FROM fss_mounttarget WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM fss_mounttarget;
+               SELECT id, region, compartment_id, name, ad, ocid, subnet_id, owner, 
+                  created_on FROM fss_mounttarget;
             '''
 
         self._cursor.execute(dml)

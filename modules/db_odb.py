@@ -57,11 +57,13 @@ class DbOdb():
     def list(self, owner=None):
         if owner is not None:
             dml = '''
-               SELECT id, region, ocid, owner FROM odb WHERE owner LIKE "%%%s";
+               SELECT  id, region, compartment_id, name, edition, shape, 
+                   storage_gbs, ocid, owner, created_on FROM odb WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM odb;
+               SELECT  id, region, compartment_id, name, edition, shape, 
+                   storage_gbs, ocid, owner, created_on FROM odb
             '''
 
         self._cursor.execute(dml)

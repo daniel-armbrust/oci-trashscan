@@ -97,12 +97,14 @@ class DbCompute():
         
     def list_computes(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM compute WHERE owner LIKE "%%%s";
+            dml = '''                
+               SELECT id, region, compartment_id, name, ad, shape, ocid, 
+                   owner, created_on FROM compute WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM compute;
+               SELECT id, region, compartment_id, name, ad, shape, ocid, 
+                   owner, created_on FROM compute;
             '''
 
         self._cursor.execute(dml)
@@ -112,12 +114,16 @@ class DbCompute():
     
     def list_custom_images(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM custom_img WHERE owner LIKE "%%%s";
+            dml = '''            
+               SELECT id, region, compartment_id, name, ocid, billable_size_in_gbs, 
+                  operating_system, operating_system_version, size_in_mbs, owner, 
+                  created_on FROM custom_img WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM custom_img;
+               SELECT id, region, compartment_id, name, ocid, billable_size_in_gbs, 
+                  operating_system, operating_system_version, size_in_mbs, owner, 
+                  created_on FROM custom_img;
             '''
 
         self._cursor.execute(dml)

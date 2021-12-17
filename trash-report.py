@@ -66,7 +66,9 @@ def start_trash_report(db_dir, html_report_path):
           <h1>%s</h1>       
     ''' % (report_title, report_title,)
     
-    service_func_list = [utils_report.adb]
+    service_func_list = [utils_report.adb, utils_report.odb, utils_report.compute, 
+        utils_report.custom_image, utils_report.blockstorage, utils_report.mysql,
+        utils_report.fss]
 
     report_f = open(html_report_path, 'a') 
     report_f.write(html_data)

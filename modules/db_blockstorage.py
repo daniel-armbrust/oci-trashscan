@@ -61,12 +61,16 @@ class DbBlockStorage():
 
     def list(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, replica_id, replica_ad, owner FROM blockstorage WHERE owner LIKE "%%%s";
+            dml = '''              
+               SELECT id, region, compartment_id, name, ad, size_gbs, size_mbs, vpus_per_gb, 
+                 replica_id, replica_ad, ocid, owner, created_on
+               FROM blockstorage WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, replica_id, replica_ad, owner FROM blockstorage;
+               SELECT id, region, compartment_id, name, ad, size_gbs, size_mbs, vpus_per_gb, 
+                 replica_id, replica_ad, ocid, owner, created_on
+               FROM blockstorage;
             '''
         self._cursor.execute(dml)
         blockstorages_list = self._cursor.fetchall()

@@ -61,8 +61,8 @@ def odb(oci_config, db_dir, user_login_delete=None):
     for odb in odbs_list:
         id = odb[0]
         region = odb[1]
-        ocid = odb[2]
-        owner = odb[3]
+        ocid = odb[7]
+        owner = odb[8]
 
         print('--> Deleting ORACLE DATABASE (odb) - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -96,8 +96,8 @@ def compute(oci_config, db_dir, user_login_delete=None):
     for compute in computes_list:
         id = compute[0]
         region = compute[1]
-        ocid = compute[2]
-        owner = compute[3]
+        ocid = compute[6]
+        owner = compute[7]
 
         print('--> Deleting COMPUTE INSTANCE - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -131,8 +131,8 @@ def custom_image(oci_config, db_dir, user_login_delete=None):
     for custom_img in custom_imgs_list:
         id = custom_img[0]
         region = custom_img[1]
-        ocid = custom_img[2]
-        owner = custom_img[3]
+        ocid = custom_img[4]
+        owner = custom_img[9]
 
         print('--> Deleting CUSTOM IMAGE - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -166,10 +166,10 @@ def blockstorage(oci_config, db_dir, user_login_delete=None):
     for blkstorage in blkstorage_list:        
         id = blkstorage[0]
         region = blkstorage[1]
-        ocid = blkstorage[2]
-        replica_id = blkstorage[3]
-        replica_ad = blkstorage[4]
-        owner = blkstorage[5]
+        ocid = blkstorage[10]
+        replica_id = blkstorage[8]
+        replica_ad = blkstorage[9]
+        owner = blkstorage[11]
 
         oci_config['region'] = region
 
@@ -210,8 +210,8 @@ def mysql(oci_config, db_dir, user_login_delete=None):
     for mysql in mysql_list:        
         id = mysql[0]
         region = mysql[1]
-        ocid = mysql[2]        
-        owner = mysql[3]
+        ocid = mysql[7]        
+        owner = mysql[8]
 
         print('--> Deleting MYSQL - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -246,7 +246,7 @@ def fss(oci_config, db_dir, user_login_delete=None):
         id = snapshot[0]
         region = snapshot[1]
         ocid = snapshot[2]
-        owner = snapshot[3]
+        owner = snapshot[6]
         
         print('--> Deleting FSS (Snapshot) - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -271,8 +271,8 @@ def fss(oci_config, db_dir, user_login_delete=None):
     for mounttarget in fss_mt_list:
         id = mounttarget[0]
         region = mounttarget[1]
-        ocid = mounttarget[2]
-        owner = mounttarget[3]
+        ocid = mounttarget[5]
+        owner = mounttarget[7]
         
         print('--> Deleting FSS (Mount Target) - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -298,8 +298,8 @@ def fss(oci_config, db_dir, user_login_delete=None):
     for filesystem in fss_fs_list:
         id = filesystem[0]
         region = filesystem[1]
-        ocid = filesystem[2]
-        owner = filesystem[3]
+        ocid = filesystem[5]
+        owner = filesystem[6]
         
         print('--> Deleting FSS (File System) - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -321,6 +321,3 @@ def fss(oci_config, db_dir, user_login_delete=None):
 
             
     db.close()
-
-    
-    

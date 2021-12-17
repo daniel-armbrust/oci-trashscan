@@ -48,12 +48,15 @@ class DbMysql():
     
     def list(self, owner=None):
         if owner is not None:
-            dml = '''
-               SELECT id, region, ocid, owner FROM mysql WHERE owner LIKE "%%%s";
+            dml = '''              
+               SELECT id, region, compartment_id, name, version, shape, highly_available, 
+                   ocid, owner, created_on 
+               FROM mysql WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
-               SELECT id, region, ocid, owner FROM mysql;
+               SELECT id, region, compartment_id, name, version, shape, highly_available, 
+                   ocid, owner, created_on FROM mysql;
             '''
 
         self._cursor.execute(dml)
