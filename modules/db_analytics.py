@@ -36,8 +36,8 @@ class DbAnalytics():
     def add(self, analytics_dict):
         dml = '''
            INSERT INTO analytics (region, compartment_id, name, capacity_type, capacity_value, 
-              feature_set, lifecycle_state, ocid, license_type, owner, created_on) 
-           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
+              feature_set, ocid, license_type, owner, created_on) 
+           VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");
         ''' % (analytics_dict['region'], analytics_dict['compartment_id'], analytics_dict['name'],
         analytics_dict['capacity_type'], analytics_dict['capacity_value'], analytics_dict['feature_set'],
         analytics_dict['ocid'], analytics_dict['license_type'], analytics_dict['owner'], 

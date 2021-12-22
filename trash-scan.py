@@ -59,12 +59,12 @@ def init_oci_sdk(config_file='~/.oci/config', region=None):
 def start_trash_scan(oci_config_file, db_dir, max_regions_parallel):
     """Function that starts the trash scan.
 
-    """    
+    """      
     #service_func_list = [utils_scan.adb, utils_scan.odb, utils_scan.compute, 
     #    utils_scan.custom_image, utils_scan.blockstorage, utils_scan.mysql, 
-    #    utils_scan.fss, utils_scan.oke, utils_scan.analytics, utils_scan.goldengate]
+    #    utils_scan.fss, utils_scan.analytics]
     
-    service_func_list = [utils_scan.fss]
+    service_func_list = [utils_scan.analytics]
 
     logo()
     print('*** Investigating compartments...\n')
