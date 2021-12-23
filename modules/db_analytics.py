@@ -48,5 +48,32 @@ class DbAnalytics():
 
         return self._cursor.lastrowid
 
+    def list(self, owner=None):
+        if owner is not None:
+            dml = '''              
+               SELECT id, region, compartment_id, name, capacity_type, capacity_value, feature_set, 
+                   ocid, license_type, owner, created_on
+               FROM analytics WHERE owner LIKE "%%%s";
+            ''' % (owner,)            
+        else:
+            dml = '''
+               SELECT id, region, compartment_id, name, capacity_type, capacity_value, feature_set, 
+                   ocid, license_type, owner, created_on
+               FROM analytics;
+            '''
+
+        self._cursor.execute(dml)
+        analytics_list = self._cursor.fetchall()
+
+        return analytics_list
+
+    def delete(self, id):
+        dml = '''
+            DELETE FROM analytics WHERE id = %d;
+        ''' % (id,)
+
+        self._cursor.execute(dml)
+        self._conn.commit()
+
     def close(self):
         self._conn.close()

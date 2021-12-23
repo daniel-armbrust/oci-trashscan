@@ -6,6 +6,7 @@ from time import sleep
 
 from oci.analytics import AnalyticsClient
 from oci import retry as oci_retry
+from oci.exceptions import ServiceError
 
 
 class OciAnalytics():
@@ -34,4 +35,34 @@ class OciAnalytics():
                 break
 
         return analytics_list
+
+    def exists(self, ocid):
+        """Check if the Analytics instances exists.
         
+        """
+        invalid_lifecycle_state = ('DELETING', 'DELETED',)
+
+        try:
+            resp = self.self._alytsclient(analytics_instance_id=ocid,            
+                retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
+        except ServiceError:
+            return False
+                
+        lifecycle_state = resp.data.lifecycle_state
+        
+        if lifecycle_state not in invalid_lifecycle_state:
+            return True
+        else:
+            return False    
+    
+    def delete(self, ocid):
+        """Deletes the specified Analytics instances.
+
+        """        
+        resp = self._alytsclient.delete_analytics_instance(analytics_instance_id=ocid, 
+            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)                
+               
+        if resp.status >= 200 and resp.status < 300:
+            return True
+        else:
+            return False        

@@ -8,7 +8,7 @@ import os
 import getopt
 
 from oci import config as oci_config
-from modules import utils_delete
+from modules import utils_delete, utils_report
 
 #
 # Globals
@@ -63,9 +63,16 @@ def start_trash_delete(oci_config_file, db_dir, user_login_delete):
     #     utils_delete.fss, utils_delete.oke, utils_delete.analytics, utils_scan.goldengate]
     service_func_list = [utils_delete.adb, utils_delete.odb, utils_delete.compute,
         utils_delete.custom_image, utils_delete.blockstorage, utils_delete.mysql,
-        utils_delete.fss]
+        utils_delete.fss, utils_delete.analytics]
 
     logo()
+    
+    answer = input('Proceed with DELETE? (Y/n) ')
+
+    if answer != 'Y':
+        print('Exiting...')
+        sys.exit(0)
+
     print('*** Starting DELETING resources...\n')
 
     config = init_oci_sdk(oci_config_file)

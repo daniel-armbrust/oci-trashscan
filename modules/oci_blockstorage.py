@@ -49,6 +49,18 @@ class OciBlockStorage():
             return True
         else:
             return False        
+    
+    def delete_volume_group(self, ocid):
+        """Deletes the specified Block Volume Group 
+
+        """
+        resp = self._blkstrclient.delete_volume_group(volume_group_id=ocid,             
+            retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
+        
+        if resp.status >= 200 and resp.status < 300:
+            return True
+        else:
+            return False        
         
     def delete_volume(self, ocid):
         """Deletes the specified Block Volume.
@@ -67,13 +79,13 @@ class OciBlockStorage():
         
         """
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)
-
-        try:
+        
+        try:            
             resp = self._blkstrclient.get_volume(volume_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
-                
+        
         lifecycle_state = resp.data.lifecycle_state
         
         if lifecycle_state not in invalid_lifecycle_state:

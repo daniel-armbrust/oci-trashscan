@@ -19,6 +19,7 @@ class DbBlockStorage():
                 vpus_per_gb INTEGER NOT NULL,
                 replica_id TEXT NOT NULL,
                 replica_ad TEXT NOT NULL,
+                volume_group_id TEXT NOT NULL,
                 ocid TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
                 owner TEXT NOT NULL,
                 created_on TEXT NOT NULL
@@ -38,12 +39,13 @@ class DbBlockStorage():
     def add(self, blockstorage_dict):        
         dml = '''
            INSERT INTO blockstorage (region, compartment_id, name, ad, 
-              size_gbs, size_mbs, vpus_per_gb, replica_id, replica_ad, ocid, owner, created_on) 
-           VALUES ("%s", "%s", "%s", "%s", "%d", "%d", "%d", "%s", "%s", "%s", "%s", "%s");
+              size_gbs, size_mbs, vpus_per_gb, replica_id, replica_ad, volume_group_id,
+              ocid, owner, created_on) 
+           VALUES ("%s", "%s", "%s", "%s", "%d", "%d", "%d", "%s", "%s", "%s", "%s", "%s", "%s");
         ''' % (blockstorage_dict['region'], blockstorage_dict['compartment_id'], 
         blockstorage_dict['name'], blockstorage_dict['ad'], blockstorage_dict['size_gbs'], 
-        blockstorage_dict['size_mbs'], blockstorage_dict['vpus_per_gb'],
-        blockstorage_dict['replica_id'], blockstorage_dict['replica_ad'], blockstorage_dict['ocid'], 
+        blockstorage_dict['size_mbs'], blockstorage_dict['vpus_per_gb'], blockstorage_dict['replica_id'], 
+        blockstorage_dict['replica_ad'], blockstorage_dict['volume_group_id'], blockstorage_dict['ocid'], 
         blockstorage_dict['owner'], blockstorage_dict['created_on'],)
 
         self._cursor.execute(dml)
@@ -63,13 +65,13 @@ class DbBlockStorage():
         if owner is not None:
             dml = '''              
                SELECT id, region, compartment_id, name, ad, size_gbs, size_mbs, vpus_per_gb, 
-                 replica_id, replica_ad, ocid, owner, created_on
+                 replica_id, replica_ad, volume_group_id, ocid, owner, created_on
                FROM blockstorage WHERE owner LIKE "%%%s";
             ''' % (owner,)            
         else:
             dml = '''
                SELECT id, region, compartment_id, name, ad, size_gbs, size_mbs, vpus_per_gb, 
-                 replica_id, replica_ad, ocid, owner, created_on
+                 replica_id, replica_ad, volume_group_id, ocid, owner, created_on
                FROM blockstorage;
             '''
         self._cursor.execute(dml)

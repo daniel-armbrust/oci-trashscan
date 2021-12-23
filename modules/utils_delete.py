@@ -6,6 +6,7 @@ from . import oci_database
 from . import oci_compute
 from . import oci_blockstorage
 from . import oci_filestorage
+from . import oci_analytics
 
 from . import db_adb
 from . import db_odb
@@ -13,6 +14,7 @@ from . import db_compute
 from . import db_blockstorage
 from . import db_mysql
 from . import db_fss
+from . import db_analytics
     
 
 def adb(oci_config, db_dir, user_login_delete=None):
@@ -166,10 +168,11 @@ def blockstorage(oci_config, db_dir, user_login_delete=None):
     for blkstorage in blkstorage_list:        
         id = blkstorage[0]
         region = blkstorage[1]
-        ocid = blkstorage[10]
+        ocid = blkstorage[11]
         replica_id = blkstorage[8]
         replica_ad = blkstorage[9]
-        owner = blkstorage[11]
+        vgroup_id = blkstorage[10]
+        owner = blkstorage[12]
 
         oci_config['region'] = region
 
@@ -180,6 +183,12 @@ def blockstorage(oci_config, db_dir, user_login_delete=None):
                 (replica_id, owner, region,))
             
             replica_deleted = oci_blkstorage.delete_replica(replica_id)
+
+        if vgroup_id:
+            print('--> Deleting BLOCK STORAGE VOLUME GROUP ID - OCID: %s | Owner: %s | Region: %s' % \
+                (vgroup_id, owner, region,))
+            
+            vgroup_deleted = oci_blkstorage.delete_volume_group(vgroup_id)
 
         print('--> Deleting BLOCK STORAGE - OCID: %s | Owner: %s | Region: %s' % \
             (ocid, owner, region,))
@@ -320,4 +329,39 @@ def fss(oci_config, db_dir, user_login_delete=None):
             db.delete_filesystem(id)
 
             
+    db.close()
+
+
+def analytics(oci_config, db_dir, user_login_delete=None):
+    """Delete Analytics instances.
+
+    """    
+    db = db_analytics.DbAnalytics(db_dir)
+
+    analytics_list = db.list(user_login_delete)
+
+    for analytic in analytics_list:        
+        id = analytic[0]
+        region = analytic[1]
+        ocid = analytic[7]        
+        owner = analytic[8]
+
+        print('--> Deleting ANALYTICS - OCID: %s | Owner: %s | Region: %s' % \
+            (ocid, owner, region,))
+        
+        oci_config['region'] = region
+        
+        oci_altcs = oci_analytics.OciAnalytics(oci_config)
+        exists = oci_altcs.exists(ocid)
+        
+        if exists:
+            deleted = oci_altcs.delete(ocid)
+
+            if deleted:
+                db.delete(id)
+            else:
+                print('\t!!! The resource was not deleted on OCI!\n')                
+        else:
+            db.delete(id)
+
     db.close()

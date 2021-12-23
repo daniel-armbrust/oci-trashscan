@@ -8,6 +8,7 @@ from . import db_compute
 from . import db_blockstorage
 from . import db_mysql
 from . import db_fss
+from . import db_analytics
     
 
 def adb(db_dir, html_file_obj):
@@ -183,8 +184,8 @@ def blockstorage(db_dir, html_file_obj):
               <tr>              
                  <th>ID</th><th>Region</th><th>Compartment</th><th>Name</th>
                  <th>AD</th><th>Size (gbs)</th><th>Size (mbs)</th><th>VPUS per GB</th>
-                 <th>Replica ID</th><th>Replica AD</th><th>OCID</th><th>Owner</th>
-                 <th>Created On</th>
+                 <th>Replica ID</th><th>Replica AD</th><th>Volume Group ID</th><th>OCID</th>
+                 <th>Owner</th><th>Created On</th>
               </tr>
           </thead>
           <tbody>
@@ -347,3 +348,42 @@ def fss(db_dir, html_file_obj):
     html_file_obj.write(html_table)
 
     db.close()
+
+
+def analytics(db_dir, html_file_obj):
+    """Generate HTML report from Analytics.
+
+    """
+    print('--> Report: ANALYTICS.')
+
+    db = db_analytics.DbAnalytics(db_dir)
+    analytics_list = db.list()
+    db.close()
+
+    html_table = '''       
+       <h2><u>Analytics</u></h2>
+       <table border="1">
+          <thead>
+              <tr>                        
+                 <th>ID</th><th>Region</th><th>Compartment</th><th>Name</th>
+                 <th>Capacity Type</th><th>Feature Set</th><th>OCID</th><th>OCID</th>
+                 <th>License Type</th><th>Owner</th><th>Created On</th>
+              </tr>
+          </thead>
+          <tbody>
+    '''
+
+    html_file_obj.write(html_table)
+
+    for analytic in analytics_list:
+       html_table = '<tr>'
+       
+       for i in range(len(analytic)):
+           html_table += '<td>%s</td>' % (analytic[i],)
+
+       html_table += '</tr>'
+
+       html_file_obj.write(html_table)        
+
+    html_table = '</tbody></table>'
+    html_file_obj.write(html_table)

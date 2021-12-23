@@ -172,7 +172,7 @@ def blockstorage(oci_config, db_dir, compartment_props):
     """
     blockstorage_dict = {'region': '', 'compartment_id': '', 'name': '', 'ad': '', 
         'size_gbs': 0, 'size_mbs': 0, 'vpus_per_gb': 0, 'ocid': '', 'replica_id': '', 
-        'replica_ad': '', 'owner': '', 'created_on': ''}
+        'replica_ad': '', 'volume_group_id': '', 'owner': '', 'created_on': ''}
 
     print('--> Scanning BLOCK STORAGE - Comp.: %s (%s) | Region: %s' % \
         (compartment_props.id, compartment_props.name, oci_config['region'],))
@@ -195,6 +195,9 @@ def blockstorage(oci_config, db_dir, compartment_props):
         if hasattr(blkstr_props, 'block_volume_replicas') and not (type(blkstr_props.block_volume_replicas) == None.__class__):            
             blockstorage_dict['replica_id'] = blkstr_props.block_volume_replicas[0].block_volume_replica_id
             blockstorage_dict['replica_ad'] = blkstr_props.block_volume_replicas[0].availability_domain
+
+        if hasattr(blkstr_props, 'volume_group_id') and not (type(blkstr_props.volume_group_id) == None.__class__):
+            blockstorage_dict['volume_group_id'] = blkstr_props.volume_group_id
 
         try:
             blockstorage_dict['owner'] = blkstr_props.defined_tags['Oracle-Tags']['CreatedBy']
