@@ -50,14 +50,14 @@ class DbFss():
         fss_db_file = db_dir + '/fss.db'        
         
         if not os.path.isfile(fss_db_file):
-            self._conn = sqlite3.connect(fss_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(fss_db_file)
+            self.__cursor = self.__conn.cursor()
             
             for table in fss_db_table:                
-                self._cursor.execute(table)
+                self.__cursor.execute(table)
         else:
-            self._conn = sqlite3.connect(fss_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(fss_db_file)
+            self.__cursor = self.__conn.cursor()
 
     def add_filesystem(self, fss_fs_dict):        
         dml = '''
@@ -66,10 +66,10 @@ class DbFss():
         ''' % (fss_fs_dict['region'], fss_fs_dict['compartment_id'], fss_fs_dict['name'],        
         fss_fs_dict['ad'], fss_fs_dict['ocid'], fss_fs_dict['owner'], fss_fs_dict['created_on'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
     
     def add_snapshot(self, fss_snp_dict):        
         dml = '''
@@ -80,10 +80,10 @@ class DbFss():
         fss_snp_dict['created_on'], fss_snp_dict['file_system_id'], fss_snp_dict['owner'],
         fss_snp_dict['provenance_id'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
     
     def add_mounttarget(self, fss_mt_dict):        
         dml = '''
@@ -94,10 +94,10 @@ class DbFss():
         fss_mt_dict['ad'], fss_mt_dict['ocid'], fss_mt_dict['subnet_id'], fss_mt_dict['owner'],
         fss_mt_dict['created_on'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
     
     def list_filesystems(self, owner=None):
         if owner is not None:
@@ -111,8 +111,8 @@ class DbFss():
                FROM fss_filesystem;
             '''
 
-        self._cursor.execute(dml)
-        filesystems_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        filesystems_list = self.__cursor.fetchall()
 
         return filesystems_list
     
@@ -128,8 +128,8 @@ class DbFss():
                FROM fss_snapshot;
             '''
 
-        self._cursor.execute(dml)
-        snapshots_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        snapshots_list = self.__cursor.fetchall()
 
         return snapshots_list
        
@@ -145,8 +145,8 @@ class DbFss():
                   created_on FROM fss_mounttarget;
             '''
 
-        self._cursor.execute(dml)
-        mounttargets_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        mounttargets_list = self.__cursor.fetchall()
 
         return mounttargets_list
     
@@ -155,24 +155,24 @@ class DbFss():
             DELETE FROM fss_filesystem WHERE id = %d;
         ''' % (id,)
         
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
     
     def delete_snapshot(self, id):
         dml = '''
             DELETE FROM fss_snapshot WHERE id = %d;
         ''' % (id,)
         
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
     
     def delete_mounttarget(self, id):
         dml = '''
             DELETE FROM fss_mounttarget WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
       
     def close(self):
-        self._conn.close()   
+        self.__conn.close()   

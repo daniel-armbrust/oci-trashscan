@@ -25,12 +25,12 @@ class DbOdb():
         odb_db_file = db_dir + '/odb.db'        
         
         if not os.path.isfile(odb_db_file):
-            self._conn = sqlite3.connect(odb_db_file)
-            self._cursor = self._conn.cursor()
-            self._cursor.execute(odb_db_table)                    
+            self.__conn = sqlite3.connect(odb_db_file)
+            self.__cursor = self.__conn.cursor()
+            self.__cursor.execute(odb_db_table)                    
         else:
-            self._conn = sqlite3.connect(odb_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(odb_db_file)
+            self.__cursor = self.__conn.cursor()
 
     def add(self, adb_dict):        
         dml = '''
@@ -41,18 +41,18 @@ class DbOdb():
         adb_dict['edition'], adb_dict['shape'], adb_dict['storage_gbs'],
         adb_dict['ocid'], adb_dict['owner'], adb_dict['created_on'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
 
     def delete(self, id):
         dml = '''
             DELETE FROM odb WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
     def list(self, owner=None):
         if owner is not None:
@@ -66,10 +66,10 @@ class DbOdb():
                    storage_gbs, ocid, owner, created_on FROM odb
             '''
 
-        self._cursor.execute(dml)
-        odbs_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        odbs_list = self.__cursor.fetchall()
 
         return odbs_list
 
     def close(self):
-        self._conn.close()
+        self.__conn.close()

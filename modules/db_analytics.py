@@ -26,12 +26,12 @@ class DbAnalytics():
         analytics_db_file = db_dir + '/analytics.db'        
         
         if not os.path.isfile(analytics_db_file):
-            self._conn = sqlite3.connect(analytics_db_file)
-            self._cursor = self._conn.cursor()
-            self._cursor.execute(analytics_db_table)
+            self.__conn = sqlite3.connect(analytics_db_file)
+            self.__cursor = self.__conn.cursor()
+            self.__cursor.execute(analytics_db_table)
         else:
-            self._conn = sqlite3.connect(analytics_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(analytics_db_file)
+            self.__cursor = self.__conn.cursor()
 
     def add(self, analytics_dict):
         dml = '''
@@ -43,10 +43,10 @@ class DbAnalytics():
         analytics_dict['ocid'], analytics_dict['license_type'], analytics_dict['owner'], 
         analytics_dict['created_on'],)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
 
     def list(self, owner=None):
         if owner is not None:
@@ -62,8 +62,8 @@ class DbAnalytics():
                FROM analytics;
             '''
 
-        self._cursor.execute(dml)
-        analytics_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        analytics_list = self.__cursor.fetchall()
 
         return analytics_list
 
@@ -72,8 +72,8 @@ class DbAnalytics():
             DELETE FROM analytics WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
     def close(self):
-        self._conn.close()
+        self.__conn.close()

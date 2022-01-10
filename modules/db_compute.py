@@ -41,14 +41,14 @@ class DbCompute():
         compute_db_file = db_dir + '/compute.db'        
         
         if not os.path.isfile(compute_db_file):
-            self._conn = sqlite3.connect(compute_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(compute_db_file)
+            self.__cursor = self.__conn.cursor()
 
             for table in compute_db_table:                
-                self._cursor.execute(table)
+                self.__cursor.execute(table)
         else:
-            self._conn = sqlite3.connect(compute_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(compute_db_file)
+            self.__cursor = self.__conn.cursor()
 
     def add_compute(self, compute_dict):        
         dml = '''
@@ -59,10 +59,10 @@ class DbCompute():
         compute_dict['ad'], compute_dict['shape'], compute_dict['ocid'], compute_dict['owner'], 
         compute_dict['created_on'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
     
     def add_custom_image(self, custom_img_dict):        
         dml = '''
@@ -74,26 +74,26 @@ class DbCompute():
         custom_img_dict['operating_system_version'], custom_img_dict['size_in_mbs'], custom_img_dict['owner'], 
         custom_img_dict['created_on'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
     
     def delete_compute(self, id):
         dml = '''
             DELETE FROM compute WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
     
     def delete_custom_image(self, id):
         dml = '''
             DELETE FROM custom_img WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
         
     def list_computes(self, owner=None):
         if owner is not None:
@@ -107,8 +107,8 @@ class DbCompute():
                    owner, created_on FROM compute;
             '''
 
-        self._cursor.execute(dml)
-        computes_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        computes_list = self.__cursor.fetchall()
 
         return computes_list
     
@@ -126,10 +126,10 @@ class DbCompute():
                   created_on FROM custom_img;
             '''
 
-        self._cursor.execute(dml)
-        custom_imgs_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        custom_imgs_list = self.__cursor.fetchall()
 
         return custom_imgs_list
 
     def close(self):
-         self._conn.close()
+         self.__conn.close()

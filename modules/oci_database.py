@@ -12,8 +12,8 @@ from oci.exceptions import ServiceError
 
 class OciDatabase():
     def __init__(self, oci_config, timeout=120): 
-        self._oci_config = oci_config
-        self._timeout = timeout      
+        self.__oci_config = oci_config
+        self.__timeout = timeout      
       
     def list_adbs(self, compartment_id):
         """List all Autonomous Databases from the specified compartment.
@@ -23,7 +23,7 @@ class OciDatabase():
         next_page_id = None
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
 
-        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)
+        dbclient = database.DatabaseClient(self.__oci_config, timeout=self.__timeout)
 
         while True:
             resp = dbclient.list_autonomous_databases(compartment_id, page=next_page_id,
@@ -46,7 +46,7 @@ class OciDatabase():
         """        
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)
 
-        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)        
+        dbclient = database.DatabaseClient(self.__oci_config, timeout=self.__timeout)        
 
         try:
             resp = dbclient.get_autonomous_database(autonomous_database_id=ocid,
@@ -65,7 +65,7 @@ class OciDatabase():
         """Delete the specified Autonomous Database.
         
         """
-        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)        
+        dbclient = database.DatabaseClient(self.__oci_config, timeout=self.__timeout)        
 
         resp = dbclient.delete_autonomous_database(autonomous_database_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
@@ -84,7 +84,7 @@ class OciDatabase():
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
         
 
-        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)
+        dbclient = database.DatabaseClient(self.__oci_config, timeout=self.__timeout)
         
         while True:
             resp = dbclient.list_db_systems(compartment_id, page=next_page_id)          
@@ -106,7 +106,7 @@ class OciDatabase():
         """
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
 
-        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)        
+        dbclient = database.DatabaseClient(self.__oci_config, timeout=self.__timeout)        
 
         try:
             resp = dbclient.get_db_system(db_system_id=ocid,
@@ -125,7 +125,7 @@ class OciDatabase():
         """Delete the specified Oracle Database.
 
         """
-        dbclient = database.DatabaseClient(self._oci_config, timeout=self._timeout)        
+        dbclient = database.DatabaseClient(self.__oci_config, timeout=self.__timeout)        
 
         resp = dbclient.delete_database(database_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
@@ -143,7 +143,7 @@ class OciDatabase():
         next_page_id = None
         invalid_lifecycle_state = ('DELETING', 'DELETED',)        
 
-        dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)
+        dbclient = mysql.DbSystemClient(self.__oci_config, timeout=self.__timeout)
 
         while True:
             resp = dbclient.list_db_systems(compartment_id, page=next_page_id)          
@@ -165,7 +165,7 @@ class OciDatabase():
         """
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
 
-        dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)    
+        dbclient = mysql.DbSystemClient(self.__oci_config, timeout=self.__timeout)    
         
         try:
             resp = dbclient.get_db_system(db_system_id=ocid,
@@ -184,7 +184,7 @@ class OciDatabase():
         """Delete the specified MySQL DB System.
 
         """
-        dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)    
+        dbclient = mysql.DbSystemClient(self.__oci_config, timeout=self.__timeout)    
 
         resp = dbclient.delete_db_system(db_system_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
@@ -198,7 +198,7 @@ class OciDatabase():
         """Get information about the specified MySQL DB System.
 
         """
-        dbclient = mysql.DbSystemClient(self._oci_config, timeout=self._timeout)
+        dbclient = mysql.DbSystemClient(self.__oci_config, timeout=self.__timeout)
 
         resp_data = dbclient.get_db_system(db_system_id=ocid).data
 

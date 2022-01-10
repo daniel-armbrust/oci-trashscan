@@ -10,7 +10,7 @@ from oci import retry as oci_retry
 
 class OciOke():
     def __init__(self, oci_config, timeout=120):
-        self._okeclient = ContainerEngineClient(oci_config, timeout=timeout)
+        self.__okeclient = ContainerEngineClient(oci_config, timeout=timeout)
     
     def list_clusters(self, compartment_id):
         """Lists all OKE (Oracle Kubernetes Engine) in a compartment.
@@ -21,7 +21,7 @@ class OciOke():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)        
         
         while True:
-            resp = self._okeclient.list_clusters(compartment_id=compartment_id, 
+            resp = self.__okeclient.list_clusters(compartment_id=compartment_id, 
                 page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:

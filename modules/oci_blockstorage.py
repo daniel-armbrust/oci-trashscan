@@ -12,7 +12,7 @@ from oci import retry as oci_retry
 
 class OciBlockStorage():
     def __init__(self, oci_config, timeout=120):
-        self._blkstrclient = BlockstorageClient(oci_config, timeout=timeout)
+        self.__blkstrclient = BlockstorageClient(oci_config, timeout=timeout)
     
     def list_volumes(self, compartment_id):
         """Lists all the block volumes in the specified compartment.
@@ -23,7 +23,7 @@ class OciBlockStorage():
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
         
         while True:
-            resp = self._blkstrclient.list_volumes(compartment_id, page=next_page_id,
+            resp = self.__blkstrclient.list_volumes(compartment_id, page=next_page_id,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
@@ -41,7 +41,7 @@ class OciBlockStorage():
         """Deletes the specified Block Volume Replica 
 
         """
-        resp = self._blkstrclient.update_volume(volume_id=ocid, 
+        resp = self.__blkstrclient.update_volume(volume_id=ocid, 
             update_volume_details=UpdateVolumeDetails(block_volume_replicas=[]),
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
@@ -54,7 +54,7 @@ class OciBlockStorage():
         """Deletes the specified Block Volume Group 
 
         """
-        resp = self._blkstrclient.delete_volume_group(volume_group_id=ocid,             
+        resp = self.__blkstrclient.delete_volume_group(volume_group_id=ocid,             
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
         if resp.status >= 200 and resp.status < 300:
@@ -66,7 +66,7 @@ class OciBlockStorage():
         """Deletes the specified Block Volume.
 
         """        
-        resp = self._blkstrclient.delete_volume(volume_id=ocid, 
+        resp = self.__blkstrclient.delete_volume(volume_id=ocid, 
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)                
                
         if resp.status >= 200 and resp.status < 300:
@@ -81,7 +81,7 @@ class OciBlockStorage():
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)
         
         try:            
-            resp = self._blkstrclient.get_volume(volume_id=ocid,
+            resp = self.__blkstrclient.get_volume(volume_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False

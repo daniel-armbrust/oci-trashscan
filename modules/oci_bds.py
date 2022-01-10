@@ -10,7 +10,7 @@ from oci import retry as oci_retry
 
 class OciBigData():
     def __init__(self, oci_config, timeout=120):
-        self._bdsclient = BdsClient(oci_config, timeout=timeout)
+        self.__bdsclient = BdsClient(oci_config, timeout=timeout)
     
     def list_bds(self, compartment_id):
         """Lists all Big Data Service clusters in a compartment.
@@ -21,7 +21,7 @@ class OciBigData():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)        
         
         while True:
-            resp = self._bdsclient.list_bds_instances(compartment_id, page=next_page_id, 
+            resp = self.__bdsclient.list_bds_instances(compartment_id, page=next_page_id, 
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:

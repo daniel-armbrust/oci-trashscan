@@ -11,7 +11,7 @@ class Identity():
 
     """
     def __init__(self, oci_config, timeout=120):
-        self._idc = identity.IdentityClient(oci_config, timeout=timeout)
+        self.__idc = identity.IdentityClient(oci_config, timeout=timeout)
        
     def list_all_compartments(self, tenant_id):
         """Return a list of all ACTIVE compartments from the Tenant.
@@ -21,7 +21,7 @@ class Identity():
         next_page_id = None
 
         while True:
-            resp = self._idc.list_compartments(compartment_id=tenant_id, lifecycle_state='ACTIVE', 
+            resp = self.__idc.list_compartments(compartment_id=tenant_id, lifecycle_state='ACTIVE', 
                 compartment_id_in_subtree=True, page=next_page_id,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
 
@@ -41,7 +41,7 @@ class Identity():
         """
         region_list = []
 
-        resp = self._idc.list_region_subscriptions(tenancy_id=tenant_id, 
+        resp = self.__idc.list_region_subscriptions(tenancy_id=tenant_id, 
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
 
         for resp_data in resp.data:
@@ -55,7 +55,7 @@ class Identity():
         """
         home_region = ''
 
-        resp = self._idc.list_region_subscriptions(tenancy_id=tenant_id,
+        resp = self.__idc.list_region_subscriptions(tenancy_id=tenant_id,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
 
         for resp_data in resp.data:
@@ -70,7 +70,7 @@ class Identity():
         """
         ad_list = []
 
-        resp = self._idc.list_availability_domains(compartment_id=compartment_id,
+        resp = self.__idc.list_availability_domains(compartment_id=compartment_id,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
 
         for resp_data in resp.data:

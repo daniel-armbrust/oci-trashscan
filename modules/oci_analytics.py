@@ -11,7 +11,7 @@ from oci.exceptions import ServiceError
 
 class OciAnalytics():
     def __init__(self, oci_config, timeout=120):
-        self._alytsclient = AnalyticsClient(oci_config, timeout=timeout)
+        self.__alytsclient = AnalyticsClient(oci_config, timeout=timeout)
     
     def list_instances(self, compartment_id):
         """Lists all Analytics instances in a compartment.
@@ -22,7 +22,7 @@ class OciAnalytics():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
         
         while True:
-            resp = self._alytsclient.list_analytics_instances(compartment_id=compartment_id, 
+            resp = self.__alytsclient.list_analytics_instances(compartment_id=compartment_id, 
                 page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
@@ -43,7 +43,7 @@ class OciAnalytics():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
 
         try:
-            resp = self.self._alytsclient(analytics_instance_id=ocid,            
+            resp = self.__alytsclient(analytics_instance_id=ocid,            
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -59,7 +59,7 @@ class OciAnalytics():
         """Deletes the specified Analytics instances.
 
         """        
-        resp = self._alytsclient.delete_analytics_instance(analytics_instance_id=ocid, 
+        resp = self.__alytsclient.delete_analytics_instance(analytics_instance_id=ocid, 
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)                
                
         if resp.status >= 200 and resp.status < 300:

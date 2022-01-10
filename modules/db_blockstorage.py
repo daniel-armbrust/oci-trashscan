@@ -29,12 +29,12 @@ class DbBlockStorage():
         blockstorage_db_file = db_dir + '/blockstorage.db'        
         
         if not os.path.isfile(blockstorage_db_file):
-            self._conn = sqlite3.connect(blockstorage_db_file)
-            self._cursor = self._conn.cursor()
-            self._cursor.execute(blockstorage_db_table)          
+            self.__conn = sqlite3.connect(blockstorage_db_file)
+            self.__cursor = self.__conn.cursor()
+            self.__cursor.execute(blockstorage_db_table)          
         else:
-            self._conn = sqlite3.connect(blockstorage_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(blockstorage_db_file)
+            self.__cursor = self.__conn.cursor()
 
     def add(self, blockstorage_dict):        
         dml = '''
@@ -48,18 +48,18 @@ class DbBlockStorage():
         blockstorage_dict['replica_ad'], blockstorage_dict['volume_group_id'], blockstorage_dict['ocid'], 
         blockstorage_dict['owner'], blockstorage_dict['created_on'],)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
 
     def delete(self, id):
         dml = '''
             DELETE FROM blockstorage WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
     def list(self, owner=None):
         if owner is not None:
@@ -74,11 +74,11 @@ class DbBlockStorage():
                  replica_id, replica_ad, volume_group_id, ocid, owner, created_on
                FROM blockstorage;
             '''
-        self._cursor.execute(dml)
-        blockstorages_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        blockstorages_list = self.__cursor.fetchall()
 
         return blockstorages_list
 
     def close(self):
-        self._conn.close()
+        self.__conn.close()
     

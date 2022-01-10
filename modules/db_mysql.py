@@ -25,12 +25,12 @@ class DbMysql():
         mysql_db_file = db_dir + '/mysql.db'        
         
         if not os.path.isfile(mysql_db_file):
-            self._conn = sqlite3.connect(mysql_db_file)
-            self._cursor = self._conn.cursor()
-            self._cursor.execute(mysql_db_table)                
+            self.__conn = sqlite3.connect(mysql_db_file)
+            self.__cursor = self.__conn.cursor()
+            self.__cursor.execute(mysql_db_table)                
         else:
-            self._conn = sqlite3.connect(mysql_db_file)
-            self._cursor = self._conn.cursor()
+            self.__conn = sqlite3.connect(mysql_db_file)
+            self.__cursor = self.__conn.cursor()
 
     def add(self, mysql_dict):        
         dml = '''
@@ -41,10 +41,10 @@ class DbMysql():
         mysql_dict['version'], mysql_dict['shape'], mysql_dict['highly_available'],
         mysql_dict['ocid'], mysql_dict['owner'], mysql_dict['created_on'],)       
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
-        return self._cursor.lastrowid
+        return self.__cursor.lastrowid
     
     def list(self, owner=None):
         if owner is not None:
@@ -59,8 +59,8 @@ class DbMysql():
                    ocid, owner, created_on FROM mysql;
             '''
 
-        self._cursor.execute(dml)
-        mysql_list = self._cursor.fetchall()
+        self.__cursor.execute(dml)
+        mysql_list = self.__cursor.fetchall()
 
         return mysql_list
     
@@ -69,8 +69,8 @@ class DbMysql():
             DELETE FROM mysql WHERE id = %d;
         ''' % (id,)
 
-        self._cursor.execute(dml)
-        self._conn.commit()
+        self.__cursor.execute(dml)
+        self.__conn.commit()
 
     def close(self):
-        self._conn.close()
+        self.__conn.close()

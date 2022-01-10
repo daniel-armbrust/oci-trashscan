@@ -11,7 +11,7 @@ from oci.exceptions import ServiceError
 
 class OciFileStorage():
     def __init__(self, oci_config, timeout=120):
-        self._fssclient = FileStorageClient(oci_config, timeout=timeout)
+        self.__fssclient = FileStorageClient(oci_config, timeout=timeout)
     
     def list_filesystems(self, compartment_id, ad):
         """List all File Storage file systems in the specified compartment.
@@ -22,7 +22,7 @@ class OciFileStorage():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)        
 
         while True:
-            resp = self._fssclient.list_file_systems(compartment_id=compartment_id, 
+            resp = self.__fssclient.list_file_systems(compartment_id=compartment_id, 
                 availability_domain=ad, page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
@@ -45,7 +45,7 @@ class OciFileStorage():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)        
 
         while True:
-            resp = self._fssclient.list_mount_targets(compartment_id=compartment_id, 
+            resp = self.__fssclient.list_mount_targets(compartment_id=compartment_id, 
                 availability_domain=ad, page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
@@ -68,7 +68,7 @@ class OciFileStorage():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)        
 
         while True:
-            resp = self._fssclient.list_snapshots(file_system_id=filesystem_id, 
+            resp = self.__fssclient.list_snapshots(file_system_id=filesystem_id, 
                 page=next_page_id, retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
            
             for resp_data in resp.data:
@@ -89,7 +89,7 @@ class OciFileStorage():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
         
         try:
-            resp = self._fssclient.get_file_system(file_system_id=ocid,
+            resp = self.__fssclient.get_file_system(file_system_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -108,7 +108,7 @@ class OciFileStorage():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
         
         try:
-            resp = self._fssclient.get_snapshot(snapshot_id=ocid,
+            resp = self.__fssclient.get_snapshot(snapshot_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -127,7 +127,7 @@ class OciFileStorage():
         invalid_lifecycle_state = ('DELETING', 'DELETED',)
         
         try:
-            resp = self._fssclient.get_mount_target(mount_target_id=ocid,
+            resp = self.__fssclient.get_mount_target(mount_target_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -143,7 +143,7 @@ class OciFileStorage():
         """Delete the specified filesystem.
 
         """
-        resp = self._fssclient.delete_file_system(file_system_id=ocid,
+        resp = self.__fssclient.delete_file_system(file_system_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
         if resp.status >= 200 and resp.status < 300:
@@ -155,7 +155,7 @@ class OciFileStorage():
         """Delete the specified snapshot.
 
         """
-        resp = self._fssclient.delete_snapshot(snapshot_id=ocid,
+        resp = self.__fssclient.delete_snapshot(snapshot_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
         if resp.status >= 200 and resp.status < 300:
@@ -167,7 +167,7 @@ class OciFileStorage():
         """Delete the specified mount target.
 
         """
-        resp = self._fssclient.delete_mount_target(mount_target_id=ocid,
+        resp = self.__fssclient.delete_mount_target(mount_target_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
         if resp.status >= 200 and resp.status < 300:

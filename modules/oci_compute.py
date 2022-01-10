@@ -11,7 +11,7 @@ from oci import retry as oci_retry
 
 class OciCompute():
     def __init__(self, oci_config, timeout=120):
-        self._cptclient = ComputeClient(oci_config, timeout=timeout)
+        self.__cptclient = ComputeClient(oci_config, timeout=timeout)
     
     def list_computes(self, compartment_id):
         """List all the compute instances in the specified compartment.
@@ -22,7 +22,7 @@ class OciCompute():
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)        
 
         while True:
-            resp = self._cptclient.list_instances(compartment_id=compartment_id, page=next_page_id,
+            resp = self.__cptclient.list_instances(compartment_id=compartment_id, page=next_page_id,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)          
            
             for resp_data in resp.data:
@@ -45,7 +45,7 @@ class OciCompute():
         invalid_lifecycle_state = ('DELETED',)
 
         while True:
-            resp = self._cptclient.list_images(compartment_id=compartment_id, page=next_page_id,
+            resp = self.__cptclient.list_images(compartment_id=compartment_id, page=next_page_id,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)          
            
             for resp_data in resp.data:
@@ -67,7 +67,7 @@ class OciCompute():
         invalid_lifecycle_state = ('TERMINATING', 'TERMINATED',)
 
         try:
-            resp = self._cptclient.get_instance(instance_id=ocid,
+            resp = self.__cptclient.get_instance(instance_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -86,7 +86,7 @@ class OciCompute():
         invalid_lifecycle_state = ('DELETED',)
 
         try:
-            resp = self._cptclient.get_image(image_id=ocid,
+            resp = self.__cptclient.get_image(image_id=ocid,
                 retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         except ServiceError:
             return False
@@ -102,7 +102,7 @@ class OciCompute():
         """Delete the specified Custom Image.
 
         """
-        resp = self._cptclient.delete_image(image_id=ocid,
+        resp = self.__cptclient.delete_image(image_id=ocid,
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)
         
         if resp.status >= 200 and resp.status < 300:
@@ -114,7 +114,7 @@ class OciCompute():
         """Terminates the specified instance.
 
         """        
-        resp = self._cptclient.terminate_instance(instance_id=ocid, 
+        resp = self.__cptclient.terminate_instance(instance_id=ocid, 
             retry_strategy=oci_retry.DEFAULT_RETRY_STRATEGY)                               
 
         if resp.status >= 200 and resp.status < 300:
